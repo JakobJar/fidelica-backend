@@ -1,6 +1,8 @@
 package org.fidelica.backend.article;
 
-public interface Article {
+import org.fidelica.backend.repository.Identifiable;
+
+public interface Article extends Identifiable {
 
     String getTitle();
 
