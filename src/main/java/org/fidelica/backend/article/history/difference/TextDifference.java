@@ -1,4 +1,4 @@
-package org.fidelica.backend.article.history;
+package org.fidelica.backend.article.history.difference;
 
 public interface TextDifference {
 

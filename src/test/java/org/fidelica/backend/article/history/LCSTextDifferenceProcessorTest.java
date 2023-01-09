@@ -1,18 +1,20 @@
 package org.fidelica.backend.article.history;
 
+import org.fidelica.backend.article.history.difference.LCSTextDifferenceProcessor;
+import org.fidelica.backend.article.history.difference.StandardTextDifference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-class LCSTextDifferenceHandlerTest {
+class LCSTextDifferenceProcessorTest {
 
-    private LCSTextDifferenceHandler differenceHandler;
+    private LCSTextDifferenceProcessor differenceHandler;
 
     @BeforeEach
     void setup() {
-        differenceHandler = new LCSTextDifferenceHandler();
+        differenceHandler = new LCSTextDifferenceProcessor();
     }
 
     @Nested

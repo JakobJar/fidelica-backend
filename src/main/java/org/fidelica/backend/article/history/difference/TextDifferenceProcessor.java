@@ -1,9 +1,9 @@
-package org.fidelica.backend.article.history;
+package org.fidelica.backend.article.history.difference;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface TextDifferenceHandler {
+public interface TextDifferenceProcessor {
 
     List<TextDifference> getDifference(String original, String edited);
 
