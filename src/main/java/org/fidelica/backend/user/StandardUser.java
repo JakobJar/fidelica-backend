@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
+import org.fidelica.backend.user.login.PasswordHash;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,18 +21,18 @@ public class StandardUser implements User {
     private final ObjectId id;
     private final String name;
     private final String email;
-    private final String passwordHash;
+    private final PasswordHash passwordHash;
     private final Collection<ObjectId> groupIds;
 
     private final Collection<String> permissions;
 
-    public StandardUser(ObjectId id, String name, String email, String passwordHash) {
+    public StandardUser(ObjectId id, String name, String email, PasswordHash passwordHash) {
         this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>());
     }
 
     @BsonCreator
     public StandardUser(@NonNull ObjectId id, @NonNull String name, @NonNull String email,
-                        @NonNull String passwordHash, @NonNull Collection<ObjectId> groupIds,
+                        @NonNull PasswordHash passwordHash, @NonNull Collection<ObjectId> groupIds,
                         @NonNull Collection<String> permissions) {
         this.id = id;
         this.name = name;
