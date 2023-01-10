@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.history.difference.TextDifference;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@BsonDiscriminator(value = "StandardArticleEdit", key = "_cls")
 public class StandardArticleEdit implements ArticleEdit {
 
     @BsonId

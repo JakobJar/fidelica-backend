@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
 
@@ -13,6 +14,7 @@ import java.util.HashSet;
 @Data
 @EqualsAndHashCode(of = "id")
 @NonNull
+@BsonDiscriminator(value = "StandardGroup", key = "_cls")
 public class StandardGroup implements Group {
 
     @BsonId
