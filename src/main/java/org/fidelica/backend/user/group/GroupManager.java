@@ -1,6 +1,17 @@
 package org.fidelica.backend.user.group;
 
-import org.fidelica.backend.user.Manager;
+import org.bson.types.ObjectId;
 
-public interface GroupManager extends Manager<Group> {
+import java.util.Collection;
+import java.util.Optional;
+
+public interface GroupManager {
+
+    void register(Group entity);
+
+    void unregister(Group entity);
+
+    Optional<Group> getById(ObjectId id);
+
+    Collection<Group> getEntities();
 }
