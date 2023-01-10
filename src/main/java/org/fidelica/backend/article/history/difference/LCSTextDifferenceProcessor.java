@@ -1,6 +1,6 @@
 package org.fidelica.backend.article.history.difference;
 
-import com.google.common.base.Preconditions;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,8 +10,7 @@ import java.util.List;
 public class LCSTextDifferenceProcessor implements TextDifferenceProcessor {
 
     @Override
-    public List<TextDifference> getDifference(String original, String edited) {
-        Preconditions.checkNotNull(original);
+    public List<TextDifference> getDifference(@NonNull String original, String edited) {
         if (edited == null)
             return Collections.emptyList();
 
@@ -52,8 +51,7 @@ public class LCSTextDifferenceProcessor implements TextDifferenceProcessor {
     }
 
     @Override
-    public String applyDifferences(String input, Collection<TextDifference> differences) {
-        Preconditions.checkNotNull(input, "input must be not null");
+    public String applyDifferences(@NonNull String input, @NonNull Collection<TextDifference> differences) {
         StringBuilder builder = new StringBuilder(input);
         for (TextDifference difference : differences) {
             builder.replace(difference.getStartIndex(), difference.getEndIndex() + 1, difference.getReplacement());

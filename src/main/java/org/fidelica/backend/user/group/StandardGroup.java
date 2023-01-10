@@ -1,18 +1,18 @@
 package org.fidelica.backend.user.group;
 
-import com.google.common.base.Preconditions;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.NonNull;
+import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-@Getter
-@ToString
+@Data
 @EqualsAndHashCode(of = "id")
+@NonNull
 public class StandardGroup implements Group {
 
     @BsonId
@@ -24,28 +24,25 @@ public class StandardGroup implements Group {
         this(id, name, new HashSet<>());
     }
 
-    public StandardGroup(ObjectId id, String name, Collection<String> permissions) {
-        Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(name);
-        Preconditions.checkNotNull(permissions);
-
+    @BsonCreator
+    public StandardGroup(@NonNull ObjectId id, @NonNull String name, @NonNull Collection<String> permissions) {
         this.id = id;
         this.name = name;
         this.permissions = permissions;
     }
 
     @Override
-    public void addPermission(String permission) {
+    public void addPermission(@NonNull String permission) {
         permissions.add(permission);
     }
 
     @Override
-    public void removePermission(String permission) {
+    public void removePermission(@NonNull String permission) {
         permissions.remove(permission);
     }
 
     @Override
-    public boolean hasPermission(String permission) {
+    public boolean hasPermission(@NonNull String permission) {
         return permissions.contains(permission);
     }
 }

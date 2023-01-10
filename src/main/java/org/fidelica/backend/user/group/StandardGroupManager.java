@@ -1,11 +1,13 @@
 package org.fidelica.backend.user.group;
 
+import lombok.NonNull;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
+@NonNull
 public class StandardGroupManager implements GroupManager {
 
     private final Map<ObjectId, Group> groups;

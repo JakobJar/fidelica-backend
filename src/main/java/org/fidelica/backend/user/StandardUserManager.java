@@ -1,5 +1,6 @@
 package org.fidelica.backend.user;
 
+import lombok.NonNull;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
@@ -16,17 +17,17 @@ public class StandardUserManager implements UserManager {
     }
 
     @Override
-    public void register(User user) {
+    public void register(@NonNull User user) {
         users.put(user.getId(), user);
     }
 
     @Override
-    public void unregister(User user) {
+    public void unregister(@NonNull User user) {
         users.remove(user.getId(), user);
     }
 
     @Override
-    public Optional<User> getById(ObjectId id) {
+    public Optional<User> getById(@NonNull ObjectId id) {
         return Optional.ofNullable(users.get(id));
     }
 

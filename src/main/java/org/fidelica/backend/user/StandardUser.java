@@ -1,9 +1,9 @@
 package org.fidelica.backend.user;
 
-import com.google.common.base.Preconditions;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.NonNull;
+import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
 
@@ -12,8 +12,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
 
-@Getter
-@ToString
+@Data
 @EqualsAndHashCode(of = "id")
 public class StandardUser implements User {
 
@@ -30,14 +29,10 @@ public class StandardUser implements User {
         this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>());
     }
 
-    public StandardUser(ObjectId id, String name, String email, String passwordHash, Collection<ObjectId> groupIds, Collection<String> permissions) {
-        Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(name);
-        Preconditions.checkNotNull(email);
-        Preconditions.checkNotNull(passwordHash);
-        Preconditions.checkNotNull(groupIds);
-        Preconditions.checkNotNull(permissions);
-
+    @BsonCreator
+    public StandardUser(@NonNull ObjectId id, @NonNull String name, @NonNull String email,
+                        @NonNull String passwordHash, @NonNull Collection<ObjectId> groupIds,
+                        @NonNull Collection<String> permissions) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -54,17 +49,17 @@ public class StandardUser implements User {
     }
 
     @Override
-    public void addPermission(String permission) {
+    public void addPermission(@NonNull String permission) {
         permissions.add(permission);
     }
 
     @Override
-    public void removePermission(String permission) {
+    public void removePermission(@NonNull String permission) {
         permissions.remove(permission);
     }
 
     @Override
-    public boolean hasPermission(String permission) {
+    public boolean hasPermission(@NonNull String permission) {
         return permissions.contains(permission);
     }
 }
