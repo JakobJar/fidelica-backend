@@ -14,7 +14,7 @@ import java.util.HashSet;
 @Data
 @EqualsAndHashCode(of = "id")
 @NonNull
-@BsonDiscriminator(value = "StandardGroup", key = "_cls")
+@BsonDiscriminator("StandardGroup")
 public class StandardGroup implements Group {
 
     @BsonId

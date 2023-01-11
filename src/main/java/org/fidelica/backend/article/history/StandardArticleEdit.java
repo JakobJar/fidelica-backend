@@ -15,7 +15,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@BsonDiscriminator(value = "StandardArticleEdit", key = "_cls")
+@BsonDiscriminator("StandardArticleEdit")
 public class StandardArticleEdit implements ArticleEdit {
 
     @BsonId

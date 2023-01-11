@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@BsonDiscriminator(value = "StandardUser", key = "_cls")
+@BsonDiscriminator("StandardUser")
 public class StandardUser implements User {
 
     @BsonId

@@ -4,7 +4,7 @@ import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 
 @Data
-@BsonDiscriminator(value = "SaltedPasswordHash", key = "_cls")
+@BsonDiscriminator("SaltedPasswordHash")
 public class SaltedPasswordHash implements PasswordHash {
 
     private final byte[] salt;
