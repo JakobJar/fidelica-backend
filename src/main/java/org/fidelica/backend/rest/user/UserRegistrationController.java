@@ -30,7 +30,7 @@ public class UserRegistrationController {
         this.passwordHandler = passwordHandler;
 
         this.usernamePattern = Pattern.compile("^[\\w.]{3,16}$");
-        this.emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$");
+        this.emailPattern = Pattern.compile("^[\\w-.]+@[\\w-]+\\.+[\\w-]{2,}$");
         this.passwordPattern = Pattern.compile("^(?=.*[A-Z])(?=.*[!@#$&*%])(?=.*\\d)(?=.*[a-z]).{8,32}$");
     }
 

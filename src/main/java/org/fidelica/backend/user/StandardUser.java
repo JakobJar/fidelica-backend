@@ -3,9 +3,9 @@ package org.fidelica.backend.user;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.user.login.PasswordHash;
 
@@ -32,7 +32,6 @@ public class StandardUser implements User {
         this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>());
     }
 
-    @BsonCreator
     public StandardUser(@NonNull ObjectId id, @NonNull String name, @NonNull String email,
                         @NonNull PasswordHash passwordHash, @NonNull Collection<ObjectId> groupIds,
                         @NonNull Collection<String> permissions) {
@@ -45,6 +44,7 @@ public class StandardUser implements User {
     }
 
     @Override
+    @BsonIgnore
     public LocalDateTime getCreationDateTime() {
         return id.getDate().toInstant()
                 .atZone(ZoneId.systemDefault())

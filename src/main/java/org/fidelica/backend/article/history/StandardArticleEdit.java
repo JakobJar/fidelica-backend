@@ -3,9 +3,9 @@ package org.fidelica.backend.article.history;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.history.difference.TextDifference;
 
@@ -24,7 +24,6 @@ public class StandardArticleEdit implements ArticleEdit {
     private final List<TextDifference> differences;
     private final ObjectId editorId;
 
-    @BsonCreator
     public StandardArticleEdit(@NonNull ObjectId id, @NonNull ObjectId articleId,
                                @NonNull List<TextDifference> differences, @NonNull ObjectId editorId) {
         this.id = id;
@@ -34,6 +33,7 @@ public class StandardArticleEdit implements ArticleEdit {
     }
 
     @Override
+    @BsonIgnore
     public LocalDateTime getDateTime() {
         return id.getDate().toInstant()
                 .atZone(ZoneId.systemDefault())

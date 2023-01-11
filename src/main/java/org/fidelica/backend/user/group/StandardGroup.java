@@ -3,7 +3,6 @@ package org.fidelica.backend.user.group;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 
 @Data
 @EqualsAndHashCode(of = "id")
-@NonNull
 @BsonDiscriminator("StandardGroup")
 public class StandardGroup implements Group {
 
@@ -26,7 +24,6 @@ public class StandardGroup implements Group {
         this(id, name, new HashSet<>());
     }
 
-    @BsonCreator
     public StandardGroup(@NonNull ObjectId id, @NonNull String name, @NonNull Collection<String> permissions) {
         this.id = id;
         this.name = name;

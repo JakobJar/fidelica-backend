@@ -2,6 +2,7 @@ package org.fidelica.backend.user;
 
 import org.bson.types.ObjectId;
 import org.fidelica.backend.repository.Identifiable;
+import org.fidelica.backend.user.login.PasswordHash;
 import org.fidelica.backend.user.permission.PermissionHolder;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ public interface User extends Identifiable, PermissionHolder {
 
     String getEmail();
 
-    String getPasswordHash();
+    PasswordHash getPasswordHash();
 
     LocalDateTime getCreationDateTime();
 
