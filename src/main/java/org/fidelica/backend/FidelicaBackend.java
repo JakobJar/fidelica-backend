@@ -11,6 +11,10 @@ import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.eclipse.jetty.http.HttpCookie;
+import org.eclipse.jetty.nosql.mongodb.MongoSessionDataStoreFactory;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.rest.user.UserRegistrationController;
 import org.fidelica.backend.user.login.PBKDFPasswordHandler;
@@ -56,12 +60,19 @@ public class FidelicaBackend {
 
         var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
         var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
-        var app = Javalin.create().start(host, port);
+        var app = Javalin.create(config -> {
+            config.jetty.sessionHandler(() -> createSessionHandler(mongoURI));
+        }).start(host, port);
 
         var userRegistrationController = new UserRegistrationController(userRepository, passwordHandler);
         app.routes(() -> {
             post("/register", userRegistrationController::createUser);
         });
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            app.stop();
+            mongoClient.close();
+        }));
     }
 
     private static MongoClient createMongoClient(@NonNull String mongoURI) {
@@ -79,5 +90,19 @@ public class FidelicaBackend {
                 .build();
 
         return MongoClients.create(settings);
+    }
+
+    private static SessionHandler createSessionHandler(@NonNull String mongoURI) {
+        var sessionHandler = new SessionHandler();
+        var sessionCache = new DefaultSessionCache(sessionHandler);
+
+        var mongoSessionDataStoreFactory = new MongoSessionDataStoreFactory();
+        mongoSessionDataStoreFactory.setConnectionString(mongoURI);
+        mongoSessionDataStoreFactory.setDbName("fidelica-backend");
+        mongoSessionDataStoreFactory.setCollectionName("sessions");
+
+        sessionHandler.setSessionCache(sessionCache);
+        sessionHandler.setSameSite(HttpCookie.SameSite.STRICT);
+        return sessionHandler;
     }
 }
