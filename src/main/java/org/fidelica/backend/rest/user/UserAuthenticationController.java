@@ -84,6 +84,7 @@ public class UserAuthenticationController {
             var user = new StandardUser(ObjectId.get(), username, email, passwordHash);
             userRepository.create(user);
             context.sessionAttribute("user", user);
+            context.json(user);
         } finally {
             registrationLock.unlock();
         }
@@ -109,15 +110,15 @@ public class UserAuthenticationController {
 
         userRepository.findByUserNameOrEmail(username).ifPresentOrElse(user -> {
             try {
-                if(!passwordHandler.validatePassword(user.getPasswordHash(), password)) {
+                if(!passwordHandler.validatePassword(user.getPasswordHash(), password))
                     throw new UnauthorizedResponse("username or password doesn't match");
-                }
             } catch (InvalidKeySpecException e) {
                 log.error("Error while hashing password", e);
                 throw new InternalServerErrorResponse("Error while hashing password");
             }
 
             context.sessionAttribute("user", user);
+            context.json(user);
         }, () -> {
             throw new UnauthorizedResponse("username or password doesn't match");
         });
@@ -125,5 +126,6 @@ public class UserAuthenticationController {
 
     public void logout(@NonNull Context context) {
         context.req().getSession().invalidate();
+        context.json("Success");
     }
 }
