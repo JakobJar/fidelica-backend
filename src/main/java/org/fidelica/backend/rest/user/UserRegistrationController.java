@@ -10,7 +10,6 @@ import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.user.StandardUser;
 import org.fidelica.backend.user.login.PasswordHandler;
 import org.fidelica.backend.user.login.PasswordHash;
-import org.jetbrains.annotations.NotNull;
 
 import java.security.spec.InvalidKeySpecException;
 import java.util.regex.Pattern;
@@ -25,7 +24,7 @@ public class UserRegistrationController {
     private final Pattern emailPattern;
     private final Pattern passwordPattern;
 
-    public UserRegistrationController(@NonNull UserRepository userRepository, @NotNull PasswordHandler passwordHandler) {
+    public UserRegistrationController(@NonNull UserRepository userRepository, @NonNull PasswordHandler passwordHandler) {
         this.userRepository = userRepository;
         this.passwordHandler = passwordHandler;
 
@@ -34,7 +33,7 @@ public class UserRegistrationController {
         this.passwordPattern = Pattern.compile("^(?=.*[A-Z])(?=.*[!@#$&*%])(?=.*\\d)(?=.*[a-z]).{8,32}$");
     }
 
-    public void createUser(@NotNull Context context) {
+    public void createUser(@NonNull Context context) {
         var username = context.formParam("username");
         var email = context.formParam("email");
         var password = context.formParam("password");
