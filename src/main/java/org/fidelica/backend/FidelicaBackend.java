@@ -1,10 +1,15 @@
 package org.fidelica.backend;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import io.javalin.Javalin;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.UuidRepresentation;
@@ -12,15 +17,26 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.fidelica.backend.repository.user.StandardUserRepository;
-import org.fidelica.backend.rest.user.UserRegistrationController;
+import org.fidelica.backend.repository.user.UserRepository;
+import org.fidelica.backend.rest.access.AccessAuthenticationRole;
+import org.fidelica.backend.rest.access.RestAccessManager;
+import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
+import org.fidelica.backend.rest.json.GsonMapper;
+import org.fidelica.backend.rest.user.UserAuthenticationController;
 import org.fidelica.backend.user.login.PBKDFPasswordHandler;
+import org.fidelica.backend.user.login.PasswordHandler;
+import org.fidelica.backend.util.DummyGoogleRecaptcha;
+import org.fidelica.backend.util.GoogleRecaptcha;
+import org.fidelica.backend.util.GoogleRecaptchaV3;
 
+import java.net.http.HttpClient;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FidelicaBackend {
 
     public static void main(String[] args) {
@@ -33,7 +49,22 @@ public class FidelicaBackend {
                 | | | | (_| |  __/ | | (_| (_| |
                 |_| |_|\\__,_|\\___|_|_|\\___\\__,_|
                 """);
+        new FidelicaBackend().start();
+    }
 
+    private MongoDatabase mongoDatabase;
+    private Javalin app;
+    private Gson gson;
+    private HttpClient httpClient;
+
+    private PasswordHandler passwordHandler;
+    private GoogleRecaptcha googleRecaptcha;
+
+    private UserRepository userRepository;
+
+    private UserAuthenticationController userAuthenticationController;
+
+    public void start() {
         String mongoURI = System.getenv("MONGO_URI");
         if (mongoURI == null) {
             log.error("ENV \"MONGO_URI\" must be set.");
@@ -41,10 +72,9 @@ public class FidelicaBackend {
         }
 
         var mongoClient = createMongoClient(mongoURI);
-        var mongoDatabase = mongoClient.getDatabase("fidelica-backend");
+        mongoDatabase = mongoClient.getDatabase("fidelica-backend");
         log.info("Successfully connected to mongodb.");
 
-        PBKDFPasswordHandler passwordHandler;
         try {
             passwordHandler = new PBKDFPasswordHandler();
         } catch (NoSuchAlgorithmException e) {
@@ -52,16 +82,26 @@ public class FidelicaBackend {
             return;
         }
 
-        var userRepository = new StandardUserRepository(mongoDatabase);
+        gson = new GsonBuilder()
+                .addDeserializationExclusionStrategy(new AnnotationExcludeStrategy())
+                .disableHtmlEscaping()
+                .create();
+
+        httpClient = HttpClient.newHttpClient();
+
+        var recaptchaKey = System.getenv("RECAPTCHA_KEY");
+        googleRecaptcha = recaptchaKey != null ? new GoogleRecaptchaV3(httpClient, gson, recaptchaKey) : new DummyGoogleRecaptcha();
+
+        registerRepositories();
 
         var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
         var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
-        var app = Javalin.create().start(host, port);
+        app = Javalin.create(config -> {
+            config.jsonMapper(new GsonMapper(gson));
+            config.accessManager(new RestAccessManager());
+        }).start(host, port);
 
-        var userRegistrationController = new UserRegistrationController(userRepository, passwordHandler);
-        app.routes(() -> {
-            post("/register", userRegistrationController::createUser);
-        });
+        registerRoutes();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             app.stop();
@@ -69,7 +109,21 @@ public class FidelicaBackend {
         }));
     }
 
-    private static MongoClient createMongoClient(@NonNull String mongoURI) {
+    private void registerRoutes() {
+        userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
+
+        app.routes(() -> {
+            post("/register", userAuthenticationController::createUser, AccessAuthenticationRole.ANONYMOUS);
+            post("/login", userAuthenticationController::login,  AccessAuthenticationRole.ANONYMOUS);
+            get("/logout", userAuthenticationController::logout);
+        });
+    }
+
+    private void registerRepositories() {
+        userRepository = new StandardUserRepository(mongoDatabase);
+    }
+
+    private MongoClient createMongoClient(@NonNull String mongoURI) {
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
                 .automatic(true)

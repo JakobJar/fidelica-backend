@@ -7,6 +7,7 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
+import org.fidelica.backend.rest.json.Exclude;
 import org.fidelica.backend.user.login.PasswordHash;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class StandardUser implements User {
     private final ObjectId id;
     private final String name;
     private final String email;
+    @Exclude
     private final PasswordHash passwordHash;
     private final Collection<ObjectId> groupIds;
 
