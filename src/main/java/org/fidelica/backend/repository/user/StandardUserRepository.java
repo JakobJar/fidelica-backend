@@ -9,6 +9,7 @@ import org.fidelica.backend.user.User;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
 
 public class StandardUserRepository implements UserRepository {
 
@@ -36,5 +37,10 @@ public class StandardUserRepository implements UserRepository {
     @Override
     public boolean isEmailExisting(String email) {
         return users.countDocuments(eq("email", email)) > 0;
+    }
+
+    @Override
+    public Optional<User> findByUserNameOrEmail(String search) {
+        return Optional.ofNullable(users.find(or(eq("name", search), eq("email", search))).first());
     }
 }

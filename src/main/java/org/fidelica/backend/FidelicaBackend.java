@@ -33,6 +33,7 @@ import java.net.http.HttpClient;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 @Slf4j
