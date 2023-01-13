@@ -1,6 +1,8 @@
 package org.fidelica.backend.user.login;
 
-public interface PasswordHash {
+import java.io.Serializable;
+
+public interface PasswordHash extends Serializable {
 
     byte[] getSalt();
 

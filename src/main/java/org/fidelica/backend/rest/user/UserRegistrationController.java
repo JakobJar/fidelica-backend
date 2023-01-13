@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.user.StandardUser;
+import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.login.PasswordHandler;
 import org.fidelica.backend.user.login.PasswordHash;
 
@@ -34,6 +35,8 @@ public class UserRegistrationController {
     }
 
     public void createUser(@NonNull Context context) {
+        System.out.println(context.<User>sessionAttribute("user"));
+
         var username = context.formParam("username");
         var email = context.formParam("email");
         var password = context.formParam("password");
@@ -60,8 +63,10 @@ public class UserRegistrationController {
             throw new InternalServerErrorResponse("Error while hashing password");
         }
         // TODO: recaptcha
-        userRepository.create(new StandardUser(ObjectId.get(), username, email, passwordHash));
-        // TODO: Set session
-        context.result("Success");
+        var user = new StandardUser(ObjectId.get(), username, email, passwordHash);
+        userRepository.create(user);
+        context.sessionAttribute("user", user);
+
+        context.json("Success");
     }
 }

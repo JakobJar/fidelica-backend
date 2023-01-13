@@ -5,10 +5,11 @@ import org.fidelica.backend.repository.Identifiable;
 import org.fidelica.backend.user.login.PasswordHash;
 import org.fidelica.backend.user.permission.PermissionHolder;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-public interface User extends Identifiable, PermissionHolder {
+public interface User extends Identifiable, PermissionHolder, Serializable {
 
     String getName();
 
