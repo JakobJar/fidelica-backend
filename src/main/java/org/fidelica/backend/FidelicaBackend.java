@@ -16,12 +16,14 @@ import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessAuthenticationRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
+import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.user.UserAuthenticationController;
 import org.fidelica.backend.user.StandardUser;
 import org.fidelica.backend.user.User;
@@ -37,8 +39,7 @@ import java.net.http.HttpClient;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -88,7 +89,8 @@ public class FidelicaBackend {
         }
 
         gson = new GsonBuilder()
-                .addDeserializationExclusionStrategy(new AnnotationExcludeStrategy())
+                .addSerializationExclusionStrategy(new AnnotationExcludeStrategy())
+                .registerTypeAdapter(ObjectId.class, new ObjectIdAdapter())
                 .disableHtmlEscaping()
                 .create();
 
@@ -118,6 +120,9 @@ public class FidelicaBackend {
         userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
 
         app.routes(() -> {
+            before("*", context -> {
+                context.header("Access-Control-Allow-Origin", "*");
+            });
             post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
             post("/login", userAuthenticationController::login,  AccessAuthenticationRole.ANONYMOUS);
             get("/logout", userAuthenticationController::logout);
