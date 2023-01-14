@@ -23,8 +23,12 @@ import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.user.UserAuthenticationController;
+import org.fidelica.backend.user.StandardUser;
+import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.login.PBKDFPasswordHandler;
 import org.fidelica.backend.user.login.PasswordHandler;
+import org.fidelica.backend.user.login.PasswordHash;
+import org.fidelica.backend.user.login.SaltedPasswordHash;
 import org.fidelica.backend.util.DummyGoogleRecaptcha;
 import org.fidelica.backend.util.GoogleRecaptcha;
 import org.fidelica.backend.util.GoogleRecaptchaV3;
@@ -114,7 +118,7 @@ public class FidelicaBackend {
         userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
 
         app.routes(() -> {
-            post("/register", userAuthenticationController::createUser, AccessAuthenticationRole.ANONYMOUS);
+            post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
             post("/login", userAuthenticationController::login,  AccessAuthenticationRole.ANONYMOUS);
             get("/logout", userAuthenticationController::logout);
         });
@@ -128,6 +132,7 @@ public class FidelicaBackend {
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
                 .automatic(true)
+                .register(User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class)
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION, Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION))
                 .build();
         var codecRegistry = CodecRegistries.fromRegistries(defaultCodec, CodecRegistries.fromProviders(pojoCodecProvider));

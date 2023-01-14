@@ -3,9 +3,7 @@ package org.fidelica.backend.user;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.*;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.rest.json.Exclude;
 import org.fidelica.backend.user.login.PasswordHash;
@@ -34,9 +32,11 @@ public class StandardUser implements User {
         this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>());
     }
 
-    public StandardUser(@NonNull ObjectId id, @NonNull String name, @NonNull String email,
-                        @NonNull PasswordHash passwordHash, @NonNull Collection<ObjectId> groupIds,
-                        @NonNull Collection<String> permissions) {
+    @BsonCreator
+    public StandardUser(@NonNull @BsonId ObjectId id, @NonNull @BsonProperty("name") String name,
+                        @NonNull @BsonProperty("email") String email, @NonNull @BsonProperty("passwordHash") PasswordHash passwordHash,
+                        @NonNull @BsonProperty("groupIds") Collection<ObjectId> groupIds,
+                        @NonNull @BsonProperty("permissions") Collection<String> permissions) {
         this.id = id;
         this.name = name;
         this.email = email;

@@ -44,8 +44,8 @@ public class UserAuthenticationController {
         this.registrationLock = new ReentrantLock();
     }
 
-    public void createUser(@NonNull Context context) {
-        var recaptchaResponse = context.formParam("g-recaptcha-response");
+    public void register(@NonNull Context context) {
+        var recaptchaResponse = context.formParam("g-recaptcha");
         var username = context.formParam("username");
         var email = context.formParam("email");
         var password = context.formParam("password");
@@ -88,16 +88,14 @@ public class UserAuthenticationController {
         } finally {
             registrationLock.unlock();
         }
-
-        context.json("Success");
     }
 
     public void login(@NonNull Context context) {
-        var recaptchaResponse = context.formParam("g-recaptcha-response");
+        var recaptchaResponse = context.formParam("g-recaptcha");
         var username = context.formParam("username");
         var password = context.formParam("password");
 
-        if (username == null || password == null)
+        if (username == null || password == null || recaptchaResponse == null)
             throw new BadRequestResponse("Incomplete form data");
 
         try {
@@ -120,7 +118,7 @@ public class UserAuthenticationController {
             context.sessionAttribute("user", user);
             context.json(user);
         }, () -> {
-            throw new UnauthorizedResponse("username or password doesn't match");
+            throw new UnauthorizedResponse("Invalid username/email or password");
         });
     }
 
