@@ -17,6 +17,10 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
+import org.eclipse.jetty.http.HttpCookie;
+import org.eclipse.jetty.server.session.DefaultSessionCache;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessAuthenticationRole;
@@ -25,6 +29,7 @@ import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.user.UserAuthenticationController;
+import org.fidelica.backend.rest.user.UserController;
 import org.fidelica.backend.user.StandardUser;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.login.PBKDFPasswordHandler;
@@ -68,6 +73,7 @@ public class FidelicaBackend {
 
     private UserRepository userRepository;
 
+    private UserController userController;
     private UserAuthenticationController userAuthenticationController;
 
     public void start() {
@@ -106,6 +112,7 @@ public class FidelicaBackend {
         app = Javalin.create(config -> {
             config.jsonMapper(new GsonMapper(gson));
             config.accessManager(new RestAccessManager());
+            config.jetty.sessionHandler(this::createSessionHandler);
         }).start(host, port);
 
         registerRoutes();
@@ -118,14 +125,18 @@ public class FidelicaBackend {
 
     private void registerRoutes() {
         userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
+        userController = new UserController(userRepository);
 
         app.routes(() -> {
             before("*", context -> {
-                context.header("Access-Control-Allow-Origin", "*");
+                context.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");
+                context.header("Access-Control-Allow-Credentials", "true");
             });
             post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
             post("/login", userAuthenticationController::login,  AccessAuthenticationRole.ANONYMOUS);
             get("/logout", userAuthenticationController::logout);
+
+            get("/user", userController::getCurrentUser);
         });
     }
 
@@ -149,5 +160,17 @@ public class FidelicaBackend {
                 .build();
 
         return MongoClients.create(settings);
+    }
+
+    private SessionHandler createSessionHandler() {
+        var sessionHandler = new SessionHandler();
+        sessionHandler.setSameSite(HttpCookie.SameSite.LAX);
+        sessionHandler.setSessionCookie("FIDELICA_SESSION");
+
+        var sessionCache = new DefaultSessionCache(sessionHandler);
+        sessionCache.setSessionDataStore(new NullSessionDataStore());
+        sessionHandler.setSessionCache(sessionCache);
+
+        return sessionHandler;
     }
 }

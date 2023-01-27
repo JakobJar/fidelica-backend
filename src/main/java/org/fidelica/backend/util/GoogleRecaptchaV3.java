@@ -37,8 +37,10 @@ public record GoogleRecaptchaV3(HttpClient httpClient, Gson gson, String secretK
 
         var json = gson.fromJson(response.body(), JsonObject.class);
         var success = json.get("success").getAsBoolean();
-        var score = json.get("score").getAsFloat();
-
-        return success && score >= REQUIRED_SCORE;
+        if (success) {
+            var score = json.get("score").getAsFloat();
+            return score >= REQUIRED_SCORE;
+        }
+        return false;
     }
 }

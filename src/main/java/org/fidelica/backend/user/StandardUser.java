@@ -21,28 +21,35 @@ public class StandardUser implements User {
     @BsonId
     private final ObjectId id;
     private final String name;
+    @Exclude
     private final String email;
     @Exclude
     private final PasswordHash passwordHash;
     private final Collection<ObjectId> groupIds;
+    private final String avatarUrl;
 
     private final Collection<String> permissions;
 
+    private boolean emailVerified;
+
     public StandardUser(ObjectId id, String name, String email, PasswordHash passwordHash) {
-        this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>());
+        this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>(), null, false);
     }
 
     @BsonCreator
     public StandardUser(@NonNull @BsonId ObjectId id, @NonNull @BsonProperty("name") String name,
                         @NonNull @BsonProperty("email") String email, @NonNull @BsonProperty("passwordHash") PasswordHash passwordHash,
                         @NonNull @BsonProperty("groupIds") Collection<ObjectId> groupIds,
-                        @NonNull @BsonProperty("permissions") Collection<String> permissions) {
+                        @NonNull @BsonProperty("permissions") Collection<String> permissions, @BsonProperty("avatarURL") String avatarUrl,
+                        @BsonProperty("emailVerified") boolean emailVerified) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
         this.groupIds = groupIds;
         this.permissions = permissions;
+        this.avatarUrl = avatarUrl;
+        this.emailVerified = emailVerified;
     }
 
     @Override
