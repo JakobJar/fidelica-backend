@@ -16,7 +16,7 @@ public class RestAccessManager implements AccessManager {
     public void manage(@NotNull Handler handler, @NotNull Context context, @NotNull Set<? extends RouteRole> roles) throws Exception {
         User user = context.sessionAttribute("user");
         if (user == null && !roles.contains(AccessAuthenticationRole.ANONYMOUS)) {
-            throw new UnauthorizedResponse();
+            throw new UnauthorizedResponse("Not logged in");
         }
 
         handler.handle(context);
