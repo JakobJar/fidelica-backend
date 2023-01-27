@@ -26,7 +26,7 @@ public class StandardUser implements User {
     @Exclude
     private final PasswordHash passwordHash;
     private final Collection<ObjectId> groupIds;
-    private final String avatarUrl;
+    private String avatarUrl;
 
     private final Collection<String> permissions;
 
