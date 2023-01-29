@@ -21,6 +21,7 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessAuthenticationRole;
@@ -154,7 +155,9 @@ public class FidelicaBackend {
                 .register(User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class)
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION, Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION))
                 .build();
-        var codecRegistry = CodecRegistries.fromRegistries(defaultCodec, CodecRegistries.fromProviders(pojoCodecProvider));
+        var codecRegistry = CodecRegistries.fromRegistries(defaultCodec,
+                CodecRegistries.fromProviders(pojoCodecProvider),
+                CodecRegistries.fromCodecs(new LocaleCodec()));
 
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(mongoURI))

@@ -11,9 +11,20 @@ public interface ArticleEdit extends Identifiable {
 
     ObjectId getArticleId();
 
+    String getDescription();
+
     List<TextDifference> getDifferences();
 
     ObjectId getEditorId();
 
     LocalDateTime getDateTime();
+
+    boolean isApproved();
+
+    boolean isChecked();
+
+    ObjectId getCheckerId();
+
+    String getComment();
+
 }
