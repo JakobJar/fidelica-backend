@@ -30,17 +30,17 @@ public class StandardUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean isUserNameExisting(String username) {
+    public boolean isUserNameExisting(@NonNull String username) {
         return users.countDocuments(eq("name", username)) > 0;
     }
 
     @Override
-    public boolean isEmailExisting(String email) {
+    public boolean isEmailExisting(@NonNull String email) {
         return users.countDocuments(eq("email", email)) > 0;
     }
 
     @Override
-    public Optional<User> findByUserNameOrEmail(String search) {
+    public Optional<User> findByUserNameOrEmail(@NonNull String search) {
         return Optional.ofNullable(users.find(or(eq("name", search), eq("email", search))).first());
     }
 }

@@ -1,11 +1,15 @@
 package org.fidelica.backend.repository.user;
 
-import org.fidelica.backend.repository.Repository;
+import org.bson.types.ObjectId;
 import org.fidelica.backend.user.User;
 
 import java.util.Optional;
 
-public interface UserRepository extends Repository<User> {
+public interface UserRepository {
+
+    void create(User User);
+
+    Optional<User> findById(ObjectId id);
 
     boolean isUserNameExisting(String username);
 
