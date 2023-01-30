@@ -21,11 +21,15 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.fidelica.backend.article.history.difference.LCSTextDifferenceProcessor;
+import org.fidelica.backend.repository.article.ArticleRepository;
+import org.fidelica.backend.repository.article.StandardArticleRepository;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessAuthenticationRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
+import org.fidelica.backend.rest.article.ArticleController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
@@ -73,9 +77,11 @@ public class FidelicaBackend {
     private GoogleRecaptcha googleRecaptcha;
 
     private UserRepository userRepository;
+    private ArticleRepository articleRepository;
 
     private UserController userController;
     private UserAuthenticationController userAuthenticationController;
+    private ArticleController articleController;
 
     public void start() {
         String mongoURI = System.getenv("MONGO_URI");
@@ -107,6 +113,7 @@ public class FidelicaBackend {
         googleRecaptcha = recaptchaKey != null ? new GoogleRecaptchaV3(httpClient, gson, recaptchaKey) : new DummyGoogleRecaptcha();
 
         registerRepositories();
+        registerControllers();
 
         var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
         var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
@@ -125,14 +132,12 @@ public class FidelicaBackend {
     }
 
     private void registerRoutes() {
-        userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
-        userController = new UserController(userRepository);
-
         app.routes(() -> {
             before("*", context -> {
                 context.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");
                 context.header("Access-Control-Allow-Credentials", "true");
             });
+
             post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
             post("/login", userAuthenticationController::login, AccessAuthenticationRole.ANONYMOUS);
             get("/logout", userAuthenticationController::logout, AccessAuthenticationRole.AUTHENTICATED);
@@ -141,11 +146,23 @@ public class FidelicaBackend {
                 get("/", userController::getCurrentUser, AccessAuthenticationRole.AUTHENTICATED);
                 get("/<id>", userController::getUserById);
             });
+
+            path("/article", () -> {
+                post("/", articleController::createArticle, AccessAuthenticationRole.AUTHENTICATED);
+            });
         });
     }
 
     private void registerRepositories() {
         userRepository = new StandardUserRepository(mongoDatabase);
+        articleRepository = new StandardArticleRepository(mongoDatabase);
+    }
+
+    private void registerControllers() {
+        userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
+        userController = new UserController(userRepository);
+
+        articleController = new ArticleController(articleRepository, new LCSTextDifferenceProcessor());
     }
 
     private MongoClient createMongoClient(@NonNull String mongoURI) {

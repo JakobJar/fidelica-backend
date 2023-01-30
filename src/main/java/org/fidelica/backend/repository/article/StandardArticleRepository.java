@@ -6,11 +6,10 @@ import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.Article;
 import org.fidelica.backend.article.history.ArticleEdit;
-import org.fidelica.backend.article.history.StandardArticleEdit;
-import org.fidelica.backend.user.User;
 
-import java.util.Collections;
 import java.util.Optional;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class StandardArticleRepository implements ArticleRepository {
 
@@ -19,20 +18,17 @@ public class StandardArticleRepository implements ArticleRepository {
 
     public StandardArticleRepository(@NonNull MongoDatabase database) {
         this.articles = database.getCollection("articles", Article.class);
-        this.edits = database.getCollection("edits", ArticleEdit.class);
+        this.edits = database.getCollection("article_edits", ArticleEdit.class);
     }
 
     @Override
-    public void create(Article article, User creator) {
+    public void create(Article article, ArticleEdit firstEdit) {
         articles.insertOne(article);
-
-        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getId(),
-                "Creation", Collections.emptyList(), creator.getId());
         edits.insertOne(firstEdit);
     }
 
     @Override
     public Optional<Article> findById(ObjectId id) {
-        return Optional.empty();
+        return Optional.ofNullable(articles.find(eq("_id", id)).first());
     }
 }
