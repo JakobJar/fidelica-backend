@@ -113,7 +113,7 @@
                     <outputDirectory>${jarOutputDirectory}</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.parrotmod.userservice.bootstrap.UserServiceBootstrap</mainClass>
+                            <mainClass>org.fidelica.backend.FidelicaBackend</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -138,9 +138,11 @@ public class FidelicaBackend {
                 context.header("Access-Control-Allow-Credentials", "true");
             });
 
-            post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
-            post("/login", userAuthenticationController::login, AccessAuthenticationRole.ANONYMOUS);
-            get("/logout", userAuthenticationController::logout, AccessAuthenticationRole.AUTHENTICATED);
+            path("/auth", () -> {
+                post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
+                post("/login", userAuthenticationController::login, AccessAuthenticationRole.ANONYMOUS);
+                get("/logout", userAuthenticationController::logout, AccessAuthenticationRole.AUTHENTICATED);
+            });
 
             path("/user", () -> {
                 get("/", userController::getCurrentUser, AccessAuthenticationRole.AUTHENTICATED);
