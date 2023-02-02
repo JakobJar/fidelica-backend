@@ -27,7 +27,7 @@ import org.fidelica.backend.repository.article.StandardArticleRepository;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
-import org.fidelica.backend.rest.access.AccessAuthenticationRole;
+import org.fidelica.backend.rest.access.AccessRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.article.ArticleController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
@@ -141,18 +141,18 @@ public class FidelicaBackend {
                 before("*", context -> {
                     context.header("Access-Control-Allow-Credentials", "true");
                 });
-                post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
-                post("/login", userAuthenticationController::login, AccessAuthenticationRole.ANONYMOUS);
-                get("/logout", userAuthenticationController::logout, AccessAuthenticationRole.AUTHENTICATED);
+                post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
+                post("/login", userAuthenticationController::login, AccessRole.ANONYMOUS);
+                get("/logout", userAuthenticationController::logout, AccessRole.AUTHENTICATED);
             });
 
             path("/user", () -> {
-                get("/", userController::getCurrentUser, AccessAuthenticationRole.AUTHENTICATED);
+                get("/", userController::getCurrentUser, AccessRole.AUTHENTICATED);
                 get("/<id>", userController::getUserById);
             });
 
             path("/article", () -> {
-                post("/", articleController::createArticle, AccessAuthenticationRole.AUTHENTICATED);
+                post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
             });
         });
     }
