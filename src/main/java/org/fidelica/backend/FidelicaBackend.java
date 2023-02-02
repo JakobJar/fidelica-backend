@@ -21,15 +21,15 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.fidelica.backend.article.history.difference.LCSTextDifferenceProcessor;
-import org.fidelica.backend.repository.article.ArticleRepository;
-import org.fidelica.backend.repository.article.StandardArticleRepository;
+import org.fidelica.backend.factcheck.history.difference.LCSTextDifferenceProcessor;
+import org.fidelica.backend.repository.article.FactCheckRepository;
+import org.fidelica.backend.repository.article.StandardFactCheckRepository;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
-import org.fidelica.backend.rest.article.ArticleController;
+import org.fidelica.backend.rest.article.FactCheckController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
@@ -77,11 +77,11 @@ public class FidelicaBackend {
     private GoogleRecaptcha googleRecaptcha;
 
     private UserRepository userRepository;
-    private ArticleRepository articleRepository;
+    private FactCheckRepository articleRepository;
 
     private UserController userController;
     private UserAuthenticationController userAuthenticationController;
-    private ArticleController articleController;
+    private FactCheckController factCheckController;
 
     public void start() {
         String mongoURI = System.getenv("MONGO_URI");
@@ -135,12 +135,10 @@ public class FidelicaBackend {
         app.routes(() -> {
             before("*", context -> {
                 context.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");
+                context.header("Access-Control-Allow-Credentials", "true");
             });
 
             path("/auth", () -> {
-                before("*", context -> {
-                    context.header("Access-Control-Allow-Credentials", "true");
-                });
                 post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
                 post("/login", userAuthenticationController::login, AccessRole.ANONYMOUS);
                 get("/logout", userAuthenticationController::logout, AccessRole.AUTHENTICATED);
@@ -152,21 +150,21 @@ public class FidelicaBackend {
             });
 
             path("/article", () -> {
-                post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
+                post("/", factCheckController::createArticle, AccessRole.AUTHENTICATED);
             });
         });
     }
 
     private void registerRepositories() {
         userRepository = new StandardUserRepository(mongoDatabase);
-        articleRepository = new StandardArticleRepository(mongoDatabase);
+        articleRepository = new StandardFactCheckRepository(mongoDatabase);
     }
 
     private void registerControllers() {
         userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
         userController = new UserController(userRepository);
 
-        articleController = new ArticleController(articleRepository, new LCSTextDifferenceProcessor());
+        factCheckController = new FactCheckController(articleRepository, new LCSTextDifferenceProcessor());
     }
 
     private MongoClient createMongoClient(@NonNull String mongoURI) {

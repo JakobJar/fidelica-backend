@@ -4,23 +4,24 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.StandardArticle;
-import org.fidelica.backend.article.history.StandardArticleEdit;
-import org.fidelica.backend.article.history.difference.TextDifferenceProcessor;
-import org.fidelica.backend.repository.article.ArticleRepository;
+import org.fidelica.backend.factcheck.FactCheckRating;
+import org.fidelica.backend.factcheck.StandardFactCheck;
+import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
+import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
+import org.fidelica.backend.repository.article.FactCheckRepository;
 import org.fidelica.backend.user.User;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class ArticleController {
+public class FactCheckController {
 
-    private final ArticleRepository repository;
+    private final FactCheckRepository repository;
     private final TextDifferenceProcessor textDifferenceProcessor;
 
     private final Pattern textPattern;
 
-    public ArticleController(ArticleRepository repository, TextDifferenceProcessor textDifferenceProcessor) {
+    public FactCheckController(FactCheckRepository repository, TextDifferenceProcessor textDifferenceProcessor) {
         this.repository = repository;
         this.textDifferenceProcessor = textDifferenceProcessor;
 
@@ -29,17 +30,25 @@ public class ArticleController {
 
     public void createArticle(@NonNull Context context) {
         var title = context.formParam("title");
-        var shortDescription = context.formParam("shortDescription");
+        var claim = context.formParam("claim");
+        var rawRating = context.formParam("rating");
         var content = context.formParam("content");
         var language = context.formParam("language");
 
-        if (title == null || shortDescription == null || content == null || language == null)
+        if (title == null || claim == null || rawRating == null || content == null || language == null)
             throw new BadRequestResponse("Invalid form data.");
 
         if (!textPattern.matcher(title).matches())
             throw new BadRequestResponse("Invalid title.");
 
-        if (!textPattern.matcher(shortDescription).matches())
+        FactCheckRating rating;
+        try {
+            rating = FactCheckRating.valueOf(rawRating);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse("Invalid rating.");
+        }
+
+        if (!textPattern.matcher(claim).matches())
             throw new BadRequestResponse("Invalid short description.");
 
         if (!textPattern.matcher(content).matches())
@@ -49,10 +58,10 @@ public class ArticleController {
         User user = context.sessionAttribute("user");
 
         // TODO: Check language is valid.
-        var article = new StandardArticle(ObjectId.get(), title, shortDescription, content, Locale.forLanguageTag(language));
+        var article = new StandardFactCheck(ObjectId.get(), title, claim, rating, content, Locale.forLanguageTag(language));
 
         var difference = textDifferenceProcessor.getDifference("", content);
-        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getId(), "Create article.", difference, user.getId());
+        var firstEdit = new StandardFactCheckEdit(ObjectId.get(), article.getId(), "Create article.", title, claim, rating, difference, user.getId());
 
         repository.create(article, firstEdit);
         context.json(article);
