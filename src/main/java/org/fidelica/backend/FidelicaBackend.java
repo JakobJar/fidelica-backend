@@ -135,10 +135,12 @@ public class FidelicaBackend {
         app.routes(() -> {
             before("*", context -> {
                 context.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");
-                context.header("Access-Control-Allow-Credentials", "true");
             });
 
             path("/auth", () -> {
+                before("*", context -> {
+                    context.header("Access-Control-Allow-Credentials", "true");
+                });
                 post("/register", userAuthenticationController::register, AccessAuthenticationRole.ANONYMOUS);
                 post("/login", userAuthenticationController::login, AccessAuthenticationRole.ANONYMOUS);
                 get("/logout", userAuthenticationController::logout, AccessAuthenticationRole.AUTHENTICATED);
