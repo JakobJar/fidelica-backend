@@ -1,4 +1,4 @@
-package org.fidelica.backend.rest.article;
+package org.fidelica.backend.rest.factcheck;
 
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;

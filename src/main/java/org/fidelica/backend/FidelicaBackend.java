@@ -28,8 +28,9 @@ import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessRole;
+import org.fidelica.backend.rest.access.CorsHandler;
 import org.fidelica.backend.rest.access.RestAccessManager;
-import org.fidelica.backend.rest.article.FactCheckController;
+import org.fidelica.backend.rest.factcheck.FactCheckController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
@@ -133,10 +134,7 @@ public class FidelicaBackend {
 
     private void registerRoutes() {
         app.routes(() -> {
-            before("*", context -> {
-                context.header("Access-Control-Allow-Origin", "http://127.0.0.1:8080");
-                context.header("Access-Control-Allow-Credentials", "true");
-            });
+            before("*", new CorsHandler());
 
             path("/auth", () -> {
                 post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
