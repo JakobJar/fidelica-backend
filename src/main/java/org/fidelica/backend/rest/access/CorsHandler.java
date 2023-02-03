@@ -8,20 +8,20 @@ import java.util.List;
 
 public class CorsHandler implements Handler {
 
-    private static final List<String> ALLOWED_ORIGINS = List.of("https://fidelica.org", "http://127.0.0.1:8080/", "http://localhost:8080");
+    private static final List<String> ALLOWED_ORIGINS = List.of("https://fidelica.org", "http://127.0.0.1:8080", "http://localhost:8080");
 
     @Override
     public void handle(@NotNull Context context) throws Exception {
-        var referer = context.header("Referer");
+        var origin = context.header("Origin");
 
-        String origin;
-        if (ALLOWED_ORIGINS.contains(referer)) {
-            origin = referer;
+        String allowedOrigin;
+        if (ALLOWED_ORIGINS.contains(origin)) {
+            allowedOrigin = origin;
         } else {
-            origin = ALLOWED_ORIGINS.get(0);
+            allowedOrigin = ALLOWED_ORIGINS.get(0);
         }
 
-        context.header("Access-Control-Allow-Origin", origin);
+        context.header("Access-Control-Allow-Origin", allowedOrigin);
         context.header("Access-Control-Allow-Credentials", "true");
     }
 }
