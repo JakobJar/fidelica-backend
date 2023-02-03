@@ -39,20 +39,20 @@ public class FactCheckController {
             throw new BadRequestResponse("Invalid form data.");
 
         if (!textPattern.matcher(title).matches())
-            throw new BadRequestResponse("Invalid title.");
+            throw new BadRequestResponse("Title contains invalid characters.");
 
         FactCheckRating rating;
         try {
-            rating = FactCheckRating.valueOf(rawRating);
+            rating = FactCheckRating.valueOf(rawRating.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse("Invalid rating.");
         }
 
         if (!textPattern.matcher(claim).matches())
-            throw new BadRequestResponse("Invalid short description.");
+            throw new BadRequestResponse("Claim contains invalid characters.");
 
         if (!textPattern.matcher(content).matches())
-            throw new BadRequestResponse("Invalid content.");
+            throw new BadRequestResponse("Content contains invalid characters.");
 
         // TODO: Check permission.
         User user = context.sessionAttribute("user");
