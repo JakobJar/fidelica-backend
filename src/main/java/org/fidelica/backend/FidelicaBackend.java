@@ -185,8 +185,8 @@ public class FidelicaBackend {
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION, Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION))
                 .build();
         var codecRegistry = CodecRegistries.fromRegistries(defaultCodec,
-                CodecRegistries.fromProviders(pojoCodecProvider),
-                CodecRegistries.fromCodecs(new LocaleCodec()));
+                CodecRegistries.fromCodecs(new LocaleCodec()),
+                CodecRegistries.fromProviders(pojoCodecProvider));
 
         var settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(mongoURI))
