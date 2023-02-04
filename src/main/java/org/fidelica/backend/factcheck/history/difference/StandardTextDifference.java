@@ -3,8 +3,10 @@ package org.fidelica.backend.factcheck.history.difference;
 import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.NonNull;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 
 @Data
+@BsonDiscriminator("StandardTextDifference")
 public final class StandardTextDifference implements TextDifference {
     private final int startIndex;
     private final int endIndex;

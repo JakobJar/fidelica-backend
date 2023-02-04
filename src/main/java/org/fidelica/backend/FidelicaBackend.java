@@ -21,6 +21,11 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.fidelica.backend.factcheck.FactCheck;
+import org.fidelica.backend.factcheck.FactCheckRating;
+import org.fidelica.backend.factcheck.StandardFactCheck;
+import org.fidelica.backend.factcheck.history.FactCheckEdit;
+import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
 import org.fidelica.backend.factcheck.history.difference.LCSTextDifferenceProcessor;
 import org.fidelica.backend.repository.article.FactCheckRepository;
 import org.fidelica.backend.repository.article.StandardFactCheckRepository;
@@ -174,7 +179,9 @@ public class FidelicaBackend {
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
                 .automatic(true)
-                .register(User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class)
+                .register(User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
+                        FactCheck.class, StandardFactCheck.class, FactCheckRating.class, FactCheckEdit.class,
+                        StandardFactCheckEdit.class)
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION, Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION))
                 .build();
         var codecRegistry = CodecRegistries.fromRegistries(defaultCodec,
