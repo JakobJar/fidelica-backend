@@ -28,7 +28,6 @@ import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.repository.user.StandardUserRepository;
 import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessRole;
-import org.fidelica.backend.rest.access.CorsHandler;
 import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.factcheck.FactCheckController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
@@ -122,6 +121,14 @@ public class FidelicaBackend {
             config.jsonMapper(new GsonMapper(gson));
             config.accessManager(new RestAccessManager());
             config.jetty.sessionHandler(this::createSessionHandler);
+
+            config.plugins.enableHttpAllowedMethodsOnRoutes();
+            config.plugins.enableCors(corsContainer -> {
+                corsContainer.add(corsConfig -> {
+                    corsConfig.allowHost("https://fidelica.org", "http://localhost:8080", "http://127.0.0.1:8080");
+                    corsConfig.allowCredentials = true;
+                });
+            });
         }).start(host, port);
 
         registerRoutes();
@@ -134,8 +141,6 @@ public class FidelicaBackend {
 
     private void registerRoutes() {
         app.routes(() -> {
-            before("*", new CorsHandler());
-
             path("/auth", () -> {
                 post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
                 post("/login", userAuthenticationController::login, AccessRole.ANONYMOUS);
@@ -187,7 +192,7 @@ public class FidelicaBackend {
 
     private SessionHandler createSessionHandler() {
         var sessionHandler = new SessionHandler();
-        sessionHandler.setSameSite(HttpCookie.SameSite.LAX);
+        sessionHandler.setSameSite(HttpCookie.SameSite.STRICT);
         sessionHandler.setSessionCookie("FIDELICA_SESSION");
 
         var sessionCache = new DefaultSessionCache(sessionHandler);
