@@ -19,14 +19,14 @@ public record UserController(UserRepository repository) {
     }
 
     public void getUserById(@NonNull Context context) {
-        ObjectId userId;
+        ObjectId id;
         try {
-            userId = new ObjectId(context.pathParam("id"));
+            id = new ObjectId(context.pathParam("id"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        repository.findById(userId).ifPresentOrElse(context::json, () -> {
+        repository.findById(id).ifPresentOrElse(context::json, () -> {
             throw new NotFoundResponse("User not found");
         });
     }

@@ -17,4 +17,8 @@ public interface FactCheck extends Identifiable {
     String getContent();
 
     Locale getLanguage();
+
+    boolean isVisible();
+
+    boolean isEditable();
 }

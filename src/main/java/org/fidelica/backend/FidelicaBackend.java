@@ -161,8 +161,9 @@ public class FidelicaBackend {
                 get("/<id>", userController::getUserById);
             });
 
-            path("/article", () -> {
-                post("/", factCheckController::createArticle, AccessRole.AUTHENTICATED);
+            path("/factcheck", () -> {
+                post("/", factCheckController::createFactCheck, AccessRole.AUTHENTICATED);
+                get("/<id>", factCheckController::getFactCheckById);
             });
         });
     }

@@ -2,6 +2,7 @@ package org.fidelica.backend.rest.factcheck;
 
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.NotFoundResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.factcheck.FactCheckRating;
@@ -28,7 +29,7 @@ public class FactCheckController {
         this.textPattern = Pattern.compile("^[\\x00-\\x7F]*$");
     }
 
-    public void createArticle(@NonNull Context context) {
+    public void createFactCheck(@NonNull Context context) {
         var title = context.formParam("title");
         var claim = context.formParam("claim");
         var rawRating = context.formParam("rating");
@@ -65,5 +66,25 @@ public class FactCheckController {
 
         repository.create(article, firstEdit);
         context.json(article);
+    }
+
+    public void getFactCheckById(@NonNull Context context) {
+        ObjectId id;
+        try {
+            id = new ObjectId(context.pathParam("id"));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse(e.getMessage());
+        }
+
+        var factCheckOptional = repository.findById(id);
+        if (factCheckOptional.isEmpty())
+            throw new NotFoundResponse("Article not found.");
+
+        var factCheck = factCheckOptional.get();
+        // TODO: Check permission.
+        if (!factCheck.isVisible())
+            throw new NotFoundResponse("Article not found.");
+
+        context.json(factCheck);
     }
 }
