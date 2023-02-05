@@ -176,13 +176,17 @@ public class FidelicaBackend {
     }
 
     private MongoClient createMongoClient(@NonNull String mongoURI) {
+        var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
+                Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
+        var classes = new Class[] { User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
+                FactCheck.class, StandardFactCheck.class, FactCheckRating.class, FactCheckEdit.class,
+                StandardFactCheckEdit.class };
+
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
                 .automatic(true)
-                .register(User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
-                        FactCheck.class, StandardFactCheck.class, FactCheckRating.class, FactCheckEdit.class,
-                        StandardFactCheckEdit.class)
-                .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION, Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION))
+                .register(classes)
+                .conventions(conventions)
                 .build();
         var codecRegistry = CodecRegistries.fromRegistries(defaultCodec,
                 CodecRegistries.fromCodecs(new LocaleCodec()),
