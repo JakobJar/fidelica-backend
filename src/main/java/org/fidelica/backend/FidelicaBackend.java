@@ -120,8 +120,6 @@ public class FidelicaBackend {
         registerRepositories();
         registerControllers();
 
-        var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
-        var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
         app = Javalin.create(config -> {
             config.jsonMapper(new GsonMapper(gson));
             config.accessManager(new RestAccessManager());
@@ -134,11 +132,17 @@ public class FidelicaBackend {
                     corsConfig.allowCredentials = true;
                 });
             });
-        }).start(host, port);
+        });
 
         registerRoutes();
 
+        var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
+        var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
+        app.start(host, port);
+        log.info("Started REST server on {}:{}", host, port);
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Shutting down...");
             app.stop();
             mongoClient.close();
         }));
