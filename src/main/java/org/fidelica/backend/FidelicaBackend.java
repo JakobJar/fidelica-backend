@@ -2,6 +2,9 @@ package org.fidelica.backend;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.*;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -22,16 +25,13 @@ import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.fidelica.backend.factcheck.FactCheck;
+import org.fidelica.backend.factcheck.FactCheckModule;
 import org.fidelica.backend.factcheck.FactCheckRating;
 import org.fidelica.backend.factcheck.StandardFactCheck;
 import org.fidelica.backend.factcheck.history.FactCheckEdit;
 import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
-import org.fidelica.backend.factcheck.history.difference.LCSTextDifferenceProcessor;
-import org.fidelica.backend.repository.article.FactCheckRepository;
-import org.fidelica.backend.repository.article.StandardFactCheckRepository;
+import org.fidelica.backend.repository.RepositoryModule;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
-import org.fidelica.backend.repository.user.StandardUserRepository;
-import org.fidelica.backend.repository.user.UserRepository;
 import org.fidelica.backend.rest.access.AccessRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.factcheck.FactCheckController;
@@ -42,23 +42,19 @@ import org.fidelica.backend.rest.user.UserAuthenticationController;
 import org.fidelica.backend.rest.user.UserController;
 import org.fidelica.backend.user.StandardUser;
 import org.fidelica.backend.user.User;
-import org.fidelica.backend.user.login.PBKDFPasswordHandler;
-import org.fidelica.backend.user.login.PasswordHandler;
+import org.fidelica.backend.user.UserModule;
 import org.fidelica.backend.user.login.PasswordHash;
 import org.fidelica.backend.user.login.SaltedPasswordHash;
-import org.fidelica.backend.util.DummyGoogleRecaptcha;
-import org.fidelica.backend.util.GoogleRecaptcha;
-import org.fidelica.backend.util.GoogleRecaptchaV3;
+import org.fidelica.backend.util.UtilModule;
 
 import java.net.http.HttpClient;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FidelicaBackend {
+public class FidelicaBackend extends AbstractModule {
 
     public static void main(String[] args) {
         log.info("""
@@ -73,68 +69,20 @@ public class FidelicaBackend {
         new FidelicaBackend().start();
     }
 
-    private MongoDatabase mongoDatabase;
-    private Javalin app;
-    private Gson gson;
-    private HttpClient httpClient;
-
-    private PasswordHandler passwordHandler;
-    private GoogleRecaptcha googleRecaptcha;
-
-    private UserRepository userRepository;
-    private FactCheckRepository articleRepository;
-
-    private UserController userController;
-    private UserAuthenticationController userAuthenticationController;
-    private FactCheckController factCheckController;
+    @Override
+    protected void configure() {
+        bindConstant().annotatedWith(Names.named("MONGO URI")).to(System.getenv("MONGO_URI"));
+        bindConstant().annotatedWith(Names.named("RECAPTCHA KEY")).to(System.getenv("RECAPTCHA_KEY"));
+        bind(HttpClient.class).toInstance(HttpClient.newHttpClient());
+    }
 
     public void start() {
-        String mongoURI = System.getenv("MONGO_URI");
-        if (mongoURI == null) {
-            log.error("ENV \"MONGO_URI\" must be set.");
-            return;
-        }
+        var injector = Guice.createInjector(this, new UserModule(),
+                new UtilModule(), new RepositoryModule(), new FactCheckModule());
 
-        var mongoClient = createMongoClient(mongoURI);
-        mongoDatabase = mongoClient.getDatabase("fidelica-backend");
-        log.info("Successfully connected to mongodb.");
+        var app = injector.getInstance(Javalin.class);
 
-        try {
-            passwordHandler = new PBKDFPasswordHandler();
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Error while initializing password handler", e);
-            return;
-        }
-
-        gson = new GsonBuilder()
-                .addSerializationExclusionStrategy(new AnnotationExcludeStrategy())
-                .registerTypeAdapter(ObjectId.class, new ObjectIdAdapter())
-                .disableHtmlEscaping()
-                .create();
-
-        httpClient = HttpClient.newHttpClient();
-
-        var recaptchaKey = System.getenv("RECAPTCHA_KEY");
-        googleRecaptcha = recaptchaKey != null ? new GoogleRecaptchaV3(httpClient, gson, recaptchaKey) : new DummyGoogleRecaptcha();
-
-        registerRepositories();
-        registerControllers();
-
-        app = Javalin.create(config -> {
-            config.jsonMapper(new GsonMapper(gson));
-            config.accessManager(new RestAccessManager());
-            config.jetty.sessionHandler(this::createSessionHandler);
-
-            config.plugins.enableHttpAllowedMethodsOnRoutes();
-            config.plugins.enableCors(corsContainer -> {
-                corsContainer.add(corsConfig -> {
-                    corsConfig.allowHost("https://fidelica.org", "http://localhost:8080", "http://127.0.0.1:8080");
-                    corsConfig.allowCredentials = true;
-                });
-            });
-        });
-
-        registerRoutes();
+        registerRoutes(app, injector);
 
         var host = System.getenv().getOrDefault("REST_HOST", "0.0.0.0");
         var port = Integer.parseInt(System.getenv().getOrDefault("REST_PORT", "80"));
@@ -144,11 +92,15 @@ public class FidelicaBackend {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("Shutting down...");
             app.stop();
-            mongoClient.close();
+            injector.getInstance(MongoClient.class).close();
         }));
     }
 
-    private void registerRoutes() {
+    private void registerRoutes(Javalin app, Injector injector) {
+        var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
+        var userController = injector.getInstance(UserController.class);
+        var factCheckController = injector.getInstance(FactCheckController.class);
+
         app.routes(() -> {
             path("/auth", () -> {
                 post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
@@ -168,19 +120,27 @@ public class FidelicaBackend {
         });
     }
 
-    private void registerRepositories() {
-        userRepository = new StandardUserRepository(mongoDatabase);
-        articleRepository = new StandardFactCheckRepository(mongoDatabase);
+    @Provides
+    @Singleton
+    private Javalin createApp(Gson gson) {
+        return Javalin.create(config -> {
+            config.jsonMapper(new GsonMapper(gson));
+            config.accessManager(new RestAccessManager());
+            config.jetty.sessionHandler(this::createSessionHandler);
+
+            config.plugins.enableHttpAllowedMethodsOnRoutes();
+            config.plugins.enableCors(corsContainer -> {
+                corsContainer.add(corsConfig -> {
+                    corsConfig.allowHost("https://fidelica.org", "http://localhost:8080", "http://127.0.0.1:8080");
+                    corsConfig.allowCredentials = true;
+                });
+            });
+        });
     }
 
-    private void registerControllers() {
-        userAuthenticationController = new UserAuthenticationController(userRepository, passwordHandler, googleRecaptcha);
-        userController = new UserController(userRepository);
-
-        factCheckController = new FactCheckController(articleRepository, new LCSTextDifferenceProcessor());
-    }
-
-    private MongoClient createMongoClient(@NonNull String mongoURI) {
+    @Provides
+    @Singleton
+    private MongoClient createMongoClient(@NonNull @Named("MONGO URI") String mongoURI) {
         var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
         var classes = new Class[] { User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
@@ -203,7 +163,25 @@ public class FidelicaBackend {
                 .codecRegistry(codecRegistry)
                 .build();
 
-        return MongoClients.create(settings);
+        var mongoClient = MongoClients.create(settings);
+        log.info("Successfully connected to MongoDB.");
+        return mongoClient;
+    }
+
+    @Provides
+    @Singleton
+    private MongoDatabase getDatabase(@NonNull MongoClient mongoClient) {
+        return mongoClient.getDatabase("fidelica-backend");
+    }
+
+    @Provides
+    @Singleton
+    private Gson createGson() {
+        return new GsonBuilder()
+                .addSerializationExclusionStrategy(new AnnotationExcludeStrategy())
+                .registerTypeAdapter(ObjectId.class, new ObjectIdAdapter())
+                .disableHtmlEscaping()
+                .create();
     }
 
     private SessionHandler createSessionHandler() {

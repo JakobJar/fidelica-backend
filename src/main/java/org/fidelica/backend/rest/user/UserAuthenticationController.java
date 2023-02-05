@@ -1,5 +1,6 @@
 package org.fidelica.backend.rest.user;
 
+import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.InternalServerErrorResponse;
@@ -32,6 +33,7 @@ public class UserAuthenticationController {
 
     private final Lock registrationLock;
 
+    @Inject
     public UserAuthenticationController(@NonNull UserRepository userRepository, @NonNull PasswordHandler passwordHandler, @NonNull GoogleRecaptcha recaptcha){
         this.userRepository = userRepository;
         this.passwordHandler = passwordHandler;

@@ -1,5 +1,6 @@
 package org.fidelica.backend.repository.article;
 
+import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.NonNull;
@@ -16,6 +17,7 @@ public class StandardFactCheckRepository implements FactCheckRepository {
     private final MongoCollection<FactCheck> articles;
     private final MongoCollection<FactCheckEdit> edits;
 
+    @Inject
     public StandardFactCheckRepository(@NonNull MongoDatabase database) {
         this.articles = database.getCollection("articles", FactCheck.class);
         this.edits = database.getCollection("article_edits", FactCheckEdit.class);

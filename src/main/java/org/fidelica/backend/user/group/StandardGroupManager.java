@@ -1,9 +1,11 @@
 package org.fidelica.backend.user.group;
 
+import com.google.inject.Inject;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +13,11 @@ import java.util.Optional;
 public class StandardGroupManager implements GroupManager {
 
     private final Map<ObjectId, Group> groups;
+
+    @Inject
+    public StandardGroupManager() {
+        this(new HashMap<>());
+    }
 
     public StandardGroupManager(Map<ObjectId, Group> groups) {
         this.groups = groups;

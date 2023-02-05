@@ -1,5 +1,6 @@
 package org.fidelica.backend.rest.factcheck;
 
+import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
@@ -22,6 +23,7 @@ public class FactCheckController {
 
     private final Pattern textPattern;
 
+    @Inject
     public FactCheckController(FactCheckRepository repository, TextDifferenceProcessor textDifferenceProcessor) {
         this.repository = repository;
         this.textDifferenceProcessor = textDifferenceProcessor;

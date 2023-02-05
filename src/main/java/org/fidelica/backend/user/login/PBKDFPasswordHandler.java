@@ -1,5 +1,6 @@
 package org.fidelica.backend.user.login;
 
+import com.google.inject.Inject;
 import lombok.NonNull;
 
 import javax.crypto.SecretKeyFactory;
@@ -13,6 +14,7 @@ public class PBKDFPasswordHandler implements PasswordHandler {
     private final SecureRandom random;
     private final SecretKeyFactory keyFactory;
 
+    @Inject
     public PBKDFPasswordHandler() throws NoSuchAlgorithmException {
         this.random = new SecureRandom();
         this.keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");

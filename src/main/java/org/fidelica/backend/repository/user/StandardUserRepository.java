@@ -1,5 +1,6 @@
 package org.fidelica.backend.repository.user;
 
+import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.NonNull;
@@ -15,6 +16,7 @@ public class StandardUserRepository implements UserRepository {
 
     private final MongoCollection<User> users;
 
+    @Inject
     public StandardUserRepository(@NonNull MongoDatabase database) {
         this.users = database.getCollection("users", User.class);
     }
