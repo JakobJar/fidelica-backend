@@ -3,6 +3,10 @@ package org.fidelica.backend.repository.user;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.user.User;
@@ -19,6 +23,15 @@ public class StandardUserRepository implements UserRepository {
     @Inject
     public StandardUserRepository(@NonNull MongoDatabase database) {
         this.users = database.getCollection("users", User.class);
+
+        var nameEmailIndexOptions = new IndexOptions()
+                .unique(true)
+                .collation(Collation.builder()
+                        .locale("en")
+                        .collationStrength(CollationStrength.SECONDARY)
+                        .build());
+        this.users.createIndex(Indexes.ascending("name"),nameEmailIndexOptions);
+        this.users.createIndex(Indexes.ascending("email"),nameEmailIndexOptions);
     }
 
     @Override
