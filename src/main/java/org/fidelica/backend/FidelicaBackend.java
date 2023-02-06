@@ -77,7 +77,8 @@ public class FidelicaBackend extends AbstractModule {
     }
 
     public void start() {
-        var injector = Guice.createInjector(this, new UserModule(),
+        var stage = Stage.valueOf(System.getenv().getOrDefault("STAGE", "PRODUCTION"));
+        var injector = Guice.createInjector(stage, this, new UserModule(),
                 new UtilModule(), new RepositoryModule(), new FactCheckModule());
 
         var app = injector.getInstance(Javalin.class);
