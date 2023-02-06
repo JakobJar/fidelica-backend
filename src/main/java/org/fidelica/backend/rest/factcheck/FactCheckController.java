@@ -73,7 +73,7 @@ public class FactCheckController {
     public void getFactCheckById(@NonNull Context context) {
         ObjectId id;
         try {
-            id = new ObjectId(context.pathParam("id"));
+            id = new ObjectId(context.pathParam("articleId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
@@ -88,5 +88,24 @@ public class FactCheckController {
             throw new NotFoundResponse("Article not found.");
 
         context.json(factCheck);
+    }
+
+    public void getFactCheckEditPreviews(@NonNull Context context) {
+        ObjectId articleId;
+        try {
+            articleId = new ObjectId(context.pathParam("articleId"));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse(e.getMessage());
+        }
+
+        var page = context.queryParamAsClass("page", Integer.class).getOrDefault(0);
+        var limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
+
+        if (page < 0 || limit < 0 || limit > 10)
+            throw new BadRequestResponse("Invalid page or limit.");
+
+        // TODO: Check permission.
+        var factCheckPreviews = repository.getEditPreviews(articleId, page, limit);
+        context.json(factCheckPreviews);
     }
 }

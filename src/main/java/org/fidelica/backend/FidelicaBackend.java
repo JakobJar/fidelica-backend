@@ -116,7 +116,10 @@ public class FidelicaBackend extends AbstractModule {
 
             path("/factcheck", () -> {
                 post("/", factCheckController::createFactCheck, AccessRole.AUTHENTICATED);
-                get("/<id>", factCheckController::getFactCheckById);
+                path("/<articleId>", () -> {
+                    get("/", factCheckController::getFactCheckById);
+                    get("/edits", factCheckController::getFactCheckEditPreviews);
+                });
             });
         });
     }
