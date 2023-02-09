@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
-import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.repository.user.UserRepository;
@@ -20,9 +19,7 @@ public class UserController {
     }
 
     public void getCurrentUser(@NonNull Context context) {
-        var user = context.<User>sessionAttribute("user");
-        if (user == null)
-            throw new UnauthorizedResponse("Not logged in");
+        User user = context.<User>sessionAttribute("user");
         context.json(user);
     }
 
@@ -33,9 +30,17 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
+        boolean preview = context.queryParamAsClass("preview", Boolean.class).getOrDefault(false);
+
+        if (preview) {
+            repository.findPreviewById(id).ifPresentOrElse(context::json, () -> {
+                throw new NotFoundResponse("User not found.");
+            });
+            return;
+        }
 
         repository.findById(id).ifPresentOrElse(context::json, () -> {
-            throw new NotFoundResponse("User not found");
+            throw new NotFoundResponse("User not found.");
         });
     }
 }

@@ -4,7 +4,6 @@ import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.rest.json.Exclude;
 import org.fidelica.backend.user.login.PasswordHash;
@@ -32,17 +31,13 @@ public class StandardUser implements User {
 
     private final Collection<String> permissions;
 
-    private boolean emailVerified;
-
     public StandardUser(ObjectId id, String name, String email, PasswordHash passwordHash) {
-        this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>(), null, false);
+        this(id, name, email, passwordHash, new HashSet<>(), new HashSet<>(), null);
     }
 
-    public StandardUser(@NonNull @BsonId ObjectId id, @NonNull @BsonProperty("name") String name,
-                        @NonNull @BsonProperty("email") String email, @NonNull @BsonProperty("passwordHash") PasswordHash passwordHash,
-                        @NonNull @BsonProperty("groupIds") Collection<ObjectId> groupIds,
-                        @NonNull @BsonProperty("permissions") Collection<String> permissions, @BsonProperty("avatarURL") String avatarUrl,
-                        @BsonProperty("emailVerified") boolean emailVerified) {
+    public StandardUser(@NonNull ObjectId id, @NonNull String name, @NonNull String email,
+                        @NonNull PasswordHash passwordHash, @NonNull Collection<ObjectId> groupIds,
+                        @NonNull Collection<String> permissions, String avatarUrl) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -50,7 +45,6 @@ public class StandardUser implements User {
         this.groupIds = groupIds;
         this.permissions = permissions;
         this.avatarUrl = avatarUrl;
-        this.emailVerified = emailVerified;
     }
 
     @Override

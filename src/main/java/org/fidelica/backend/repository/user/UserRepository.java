@@ -7,9 +7,11 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    void create(User User);
+    void create(User user);
 
     Optional<User> findById(ObjectId id);
+
+    Optional<User> findPreviewById(ObjectId id);
 
     boolean isUserNameExisting(String username);
 

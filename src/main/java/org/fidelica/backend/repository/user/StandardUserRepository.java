@@ -3,11 +3,9 @@ package org.fidelica.backend.repository.user;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Collation;
-import com.mongodb.client.model.CollationStrength;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.*;
 import lombok.NonNull;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.user.User;
 
@@ -17,6 +15,8 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.or;
 
 public class StandardUserRepository implements UserRepository {
+
+    private static final Bson PREVIEW_PROJECTION = Projections.include("_t", "_id", "name", "avatarUrl");
 
     private final MongoCollection<User> users;
 
@@ -42,6 +42,11 @@ public class StandardUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(@NonNull ObjectId id) {
         return Optional.ofNullable(users.find(eq("_id", id)).first());
+    }
+
+    @Override
+    public Optional<User> findPreviewById(@NonNull ObjectId id) {
+        return Optional.ofNullable(users.find(eq("_id", id)).projection(PREVIEW_PROJECTION).first());
     }
 
     @Override
