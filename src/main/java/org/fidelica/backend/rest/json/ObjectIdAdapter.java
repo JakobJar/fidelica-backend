@@ -11,6 +11,10 @@ public class ObjectIdAdapter extends TypeAdapter<ObjectId> {
 
     @Override
     public void write(JsonWriter jsonWriter, ObjectId objectId) throws IOException {
+        if (objectId == null) {
+            jsonWriter.nullValue();
+            return;
+        }
         jsonWriter.value(objectId.toHexString());
     }
 

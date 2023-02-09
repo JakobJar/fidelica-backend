@@ -73,7 +73,7 @@ public class FactCheckController {
     public void getFactCheckById(@NonNull Context context) {
         ObjectId id;
         try {
-            id = new ObjectId(context.pathParam("articleId"));
+            id = new ObjectId(context.pathParam("factcheckId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
@@ -93,7 +93,7 @@ public class FactCheckController {
     public void getFactCheckEditPreviews(@NonNull Context context) {
         ObjectId articleId;
         try {
-            articleId = new ObjectId(context.pathParam("articleId"));
+            articleId = new ObjectId(context.pathParam("factcheckId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }

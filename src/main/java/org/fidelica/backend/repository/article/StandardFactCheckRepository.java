@@ -18,7 +18,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class StandardFactCheckRepository implements FactCheckRepository {
 
-    private static final Bson EDIT_PREVIEW_PROJECTION = Projections.include("_id", "factCheckId",
+    private static final Bson EDIT_PREVIEW_PROJECTION = Projections.include("_t", "_id", "factCheckId",
             "description", "editorId", "approved", "checkerId", "comment");
 
     private final MongoCollection<FactCheck> articles;
@@ -43,7 +43,7 @@ public class StandardFactCheckRepository implements FactCheckRepository {
 
     @Override
     public List<FactCheckEdit> getEditPreviews(ObjectId factcheckId, int limit, int offset) {
-        return edits.find(eq("articleId", factcheckId))
+        return edits.find(eq("factCheckId", factcheckId))
                 .projection(EDIT_PREVIEW_PROJECTION)
                 .skip(offset * limit)
                 .limit(limit)
