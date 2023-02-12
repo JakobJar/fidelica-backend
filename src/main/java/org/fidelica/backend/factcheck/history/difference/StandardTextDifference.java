@@ -1,12 +1,15 @@
 package org.fidelica.backend.factcheck.history.difference;
 
 import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 
 @Data
 @BsonDiscriminator("StandardTextDifference")
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public final class StandardTextDifference implements TextDifference {
     private final int startIndex;
     private final int endIndex;

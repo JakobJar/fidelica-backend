@@ -24,7 +24,7 @@ public class FactCheckController {
     private final Pattern textPattern;
 
     @Inject
-    public FactCheckController(FactCheckRepository repository, TextDifferenceProcessor textDifferenceProcessor) {
+    public FactCheckController(@NonNull FactCheckRepository repository, @NonNull TextDifferenceProcessor textDifferenceProcessor) {
         this.repository = repository;
         this.textDifferenceProcessor = textDifferenceProcessor;
 
@@ -63,7 +63,7 @@ public class FactCheckController {
         // TODO: Check language is valid.
         var article = new StandardFactCheck(ObjectId.get(), title, claim, rating, content, Locale.forLanguageTag(language));
 
-        var difference = textDifferenceProcessor.getDifference("", content);
+        var difference = textDifferenceProcessor.getDifference(content, "");
         var firstEdit = new StandardFactCheckEdit(ObjectId.get(), article.getId(), "Create article.", title, claim, rating, difference, user.getId());
 
         repository.create(article, firstEdit);
@@ -88,24 +88,5 @@ public class FactCheckController {
             throw new NotFoundResponse("Article not found.");
 
         context.json(factCheck);
-    }
-
-    public void getFactCheckEditPreviews(@NonNull Context context) {
-        ObjectId articleId;
-        try {
-            articleId = new ObjectId(context.pathParam("factcheckId"));
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestResponse(e.getMessage());
-        }
-
-        var page = context.queryParamAsClass("page", Integer.class).getOrDefault(0);
-        var limit = context.queryParamAsClass("limit", Integer.class).getOrDefault(10);
-
-        if (page < 0 || limit < 0 || limit > 10)
-            throw new BadRequestResponse("Invalid page or limit.");
-
-        // TODO: Check permission.
-        var factCheckPreviews = repository.getEditPreviews(articleId, page, limit);
-        context.json(factCheckPreviews);
     }
 }

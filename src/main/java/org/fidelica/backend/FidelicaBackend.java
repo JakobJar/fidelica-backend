@@ -30,11 +30,14 @@ import org.fidelica.backend.factcheck.FactCheckRating;
 import org.fidelica.backend.factcheck.StandardFactCheck;
 import org.fidelica.backend.factcheck.history.FactCheckEdit;
 import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
+import org.fidelica.backend.factcheck.history.difference.StandardTextDifference;
+import org.fidelica.backend.factcheck.history.difference.TextDifference;
 import org.fidelica.backend.repository.RepositoryModule;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.rest.access.AccessRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.factcheck.FactCheckController;
+import org.fidelica.backend.rest.factcheck.FactCheckEditController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
@@ -101,6 +104,7 @@ public class FidelicaBackend extends AbstractModule {
         var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
         var userController = injector.getInstance(UserController.class);
         var factCheckController = injector.getInstance(FactCheckController.class);
+        var factCheckEditController = injector.getInstance(FactCheckEditController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -118,7 +122,10 @@ public class FidelicaBackend extends AbstractModule {
                 post("/", factCheckController::createFactCheck, AccessRole.AUTHENTICATED);
                 path("/{factcheckId}", () -> {
                     get("/", factCheckController::getFactCheckById);
-                    get("/edits", factCheckController::getFactCheckEditPreviews);
+                    get("/edits", factCheckEditController::getFactCheckEditPreviews);
+                    path("/edit", () -> {
+                        get("/<editId>", factCheckEditController::getEditById);
+                    });
                 });
             });
         });
@@ -149,7 +156,7 @@ public class FidelicaBackend extends AbstractModule {
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
         var classes = new Class[] { User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
                 FactCheck.class, StandardFactCheck.class, FactCheckRating.class, FactCheckEdit.class,
-                StandardFactCheckEdit.class };
+                StandardFactCheckEdit.class , TextDifference.class, StandardTextDifference.class };
 
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
