@@ -35,6 +35,7 @@ import org.fidelica.backend.rest.factcheck.FactCheckEditController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
+import org.fidelica.backend.rest.post.PostController;
 import org.fidelica.backend.rest.user.UserAuthenticationController;
 import org.fidelica.backend.rest.user.UserController;
 import org.fidelica.backend.user.UserModule;
@@ -93,6 +94,7 @@ public class FidelicaBackend extends AbstractModule {
     private void registerRoutes(Javalin app, Injector injector) {
         var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
         var userController = injector.getInstance(UserController.class);
+        var postController = injector.getInstance(PostController.class);
         var factCheckController = injector.getInstance(FactCheckController.class);
         var factCheckEditController = injector.getInstance(FactCheckEditController.class);
 
@@ -106,6 +108,10 @@ public class FidelicaBackend extends AbstractModule {
             path("/user", () -> {
                 get("/", userController::getCurrentUser, AccessRole.AUTHENTICATED);
                 get("/{id}", userController::getUserById);
+            });
+
+            path("/check", () -> {
+                get("/{url}", postController::getByURL, AccessRole.AUTHENTICATED);
             });
 
             path("/factcheck", () -> {
