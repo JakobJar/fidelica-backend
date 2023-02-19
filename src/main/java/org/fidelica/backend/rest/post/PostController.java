@@ -10,10 +10,10 @@ import java.util.Set;
 
 public class PostController {
 
-    private final Set<PostURLProvider<?>> postURLProvider;
+    private final Set<PostURLProvider> postURLProvider;
 
     @Inject
-    public PostController(@NonNull Set<PostURLProvider<?>> postURLProvider) {
+    public PostController(@NonNull Set<PostURLProvider> postURLProvider) {
         this.postURLProvider = postURLProvider;
     }
 
