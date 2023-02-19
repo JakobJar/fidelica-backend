@@ -24,14 +24,8 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.fidelica.backend.factcheck.FactCheck;
 import org.fidelica.backend.factcheck.FactCheckModule;
-import org.fidelica.backend.factcheck.FactCheckRating;
-import org.fidelica.backend.factcheck.StandardFactCheck;
-import org.fidelica.backend.factcheck.history.FactCheckEdit;
-import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
-import org.fidelica.backend.factcheck.history.difference.StandardTextDifference;
-import org.fidelica.backend.factcheck.history.difference.TextDifference;
+import org.fidelica.backend.post.PostModule;
 import org.fidelica.backend.repository.RepositoryModule;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.rest.access.AccessRole;
@@ -43,11 +37,7 @@ import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.user.UserAuthenticationController;
 import org.fidelica.backend.rest.user.UserController;
-import org.fidelica.backend.user.StandardUser;
-import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.UserModule;
-import org.fidelica.backend.user.login.PasswordHash;
-import org.fidelica.backend.user.login.SaltedPasswordHash;
 import org.fidelica.backend.util.UtilModule;
 
 import java.net.http.HttpClient;
@@ -82,7 +72,7 @@ public class FidelicaBackend extends AbstractModule {
     public void start() {
         var stage = Stage.valueOf(System.getenv().getOrDefault("STAGE", "PRODUCTION"));
         var injector = Guice.createInjector(stage, this, new UserModule(),
-                new UtilModule(), new RepositoryModule(), new FactCheckModule());
+                new UtilModule(), new RepositoryModule(), new FactCheckModule(), new PostModule());
 
         var app = injector.getInstance(Javalin.class);
 
@@ -154,14 +144,13 @@ public class FidelicaBackend extends AbstractModule {
     private MongoClient createMongoClient(@NonNull @Named("MONGO URI") String mongoURI) {
         var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
-        var classes = new Class[] { User.class, StandardUser.class, PasswordHash.class, SaltedPasswordHash.class,
-                FactCheck.class, StandardFactCheck.class, FactCheckRating.class, FactCheckEdit.class,
-                StandardFactCheckEdit.class , TextDifference.class, StandardTextDifference.class };
+        var packages = new String[] { "org.fidelica.backend.user", "org.fidelica.backend.factcheck",
+                "org.fidelica.backend.post" };
 
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
                 .automatic(true)
-                .register(classes)
+                .register(packages)
                 .conventions(conventions)
                 .build();
         var codecRegistry = CodecRegistries.fromRegistries(defaultCodec,
