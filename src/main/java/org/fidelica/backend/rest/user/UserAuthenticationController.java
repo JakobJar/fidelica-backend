@@ -55,33 +55,33 @@ public class UserAuthenticationController {
             throw new BadRequestResponse("Incomplete form data");
 
         if (!usernamePattern.matcher(username).matches())
-            throw new BadRequestResponse("Invalid username");
+            throw new BadRequestResponse("The username contains invalid characters or is to long/short.");
         if (!emailPattern.matcher(email).matches())
-            throw new BadRequestResponse("Invalid email");
+            throw new BadRequestResponse("The email is invalid.");
         if (!passwordPattern.matcher(password).matches())
-            throw new BadRequestResponse("Invalid password");
+            throw new BadRequestResponse("Password doesn't match the requirements.");
 
         try {
             if (!recaptcha.isValid(recaptchaResponse))
-                throw new UnauthorizedResponse("Invalid recaptcha");
+                throw new UnauthorizedResponse("Invalid recaptcha.");
         } catch (IOException | InterruptedException e) {
             log.error("Couldn't verify recaptcha", e);
-            throw new UnauthorizedResponse("Couldn't verify recaptcha");
+            throw new UnauthorizedResponse("Couldn't verify recaptcha.");
         }
 
         registrationLock.lock();
         try {
             if (userRepository.isUserNameExisting(username))
-                throw new BadRequestResponse("Username already in use");
+                throw new BadRequestResponse("Username is already in use.");
             if (userRepository.isEmailExisting(email))
-                throw new BadRequestResponse("Email already in use");
+                throw new BadRequestResponse("Email is already in use.");
 
             PasswordHash passwordHash;
             try {
                 passwordHash = passwordHandler.generateHash(password);
             } catch (InvalidKeySpecException e) {
                 log.error("Error while hashing password", e);
-                throw new InternalServerErrorResponse("Error while hashing password");
+                throw new InternalServerErrorResponse("Error while hashing password.");
             }
             var user = new StandardUser(ObjectId.get(), username, email, passwordHash);
             userRepository.create(user);
@@ -98,30 +98,29 @@ public class UserAuthenticationController {
         var password = context.formParam("password");
 
         if (username == null || password == null || recaptchaResponse == null)
-            throw new BadRequestResponse("Incomplete form data");
+            throw new BadRequestResponse("From data is incomplete");
 
         try {
             if (!recaptcha.isValid(recaptchaResponse))
-                throw new UnauthorizedResponse("Invalid recaptcha");
+                throw new UnauthorizedResponse("Invalid recaptcha.");
         } catch (IOException | InterruptedException e) {
             log.error("Couldn't verify recaptcha", e);
             throw new UnauthorizedResponse("Couldn't verify recaptcha");
         }
 
-        userRepository.findByUserNameOrEmail(username).ifPresentOrElse(user -> {
-            try {
-                if(!passwordHandler.validatePassword(user.getPasswordHash(), password))
-                    throw new UnauthorizedResponse("username or password doesn't match");
-            } catch (InvalidKeySpecException e) {
-                log.error("Error while hashing password", e);
-                throw new InternalServerErrorResponse("Error while hashing password");
-            }
+        var user = userRepository.findByUserNameOrEmail(username)
+                .orElseThrow(() -> new UnauthorizedResponse("Invalid username/email or password."));
 
-            context.sessionAttribute("user", user);
-            context.json(user);
-        }, () -> {
-            throw new UnauthorizedResponse("Invalid username/email or password");
-        });
+        try {
+            if(!passwordHandler.validatePassword(user.getPasswordHash(), password))
+                throw new UnauthorizedResponse("Username or password is incorrect.");
+        } catch (InvalidKeySpecException e) {
+            log.error("Error while hashing password", e);
+            throw new InternalServerErrorResponse("Error while hashing password.");
+        }
+
+        context.sessionAttribute("user", user);
+        context.json(user);
     }
 
     public void logout(@NonNull Context context) {

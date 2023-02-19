@@ -78,11 +78,7 @@ public class FactCheckController {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var factCheckOptional = repository.findById(id);
-        if (factCheckOptional.isEmpty())
-            throw new NotFoundResponse("Article not found.");
-
-        var factCheck = factCheckOptional.get();
+        var factCheck = repository.findById(id).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
         // TODO: Check permission.
         if (!factCheck.isVisible())
             throw new NotFoundResponse("Article not found.");

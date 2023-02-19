@@ -52,16 +52,9 @@ public class FactCheckEditController {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var factCheckOptional = repository.findById(factcheckId);
-        if (factCheckOptional.isEmpty())
-            throw new NotFoundResponse("FactCheck not found.");
+        var factCheck = repository.findById(factcheckId).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
+        var edit = repository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
-        var editOptional = repository.findEditById(editId);
-        if (editOptional.isEmpty())
-            throw new NotFoundResponse("Edit not found.");
-
-        var factCheck = factCheckOptional.get();
-        var edit = editOptional.get();
         var editsAfter = repository.getEditDifferencesAfter(factcheckId, editId);
 
         var newContent = factCheck.getContent();
