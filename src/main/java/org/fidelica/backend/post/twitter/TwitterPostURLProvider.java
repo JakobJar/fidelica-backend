@@ -28,11 +28,13 @@ public class TwitterPostURLProvider implements PostURLProvider<Tweet> {
     }
 
     @Override
-    public void createPost(@NonNull String url, PostCheck check) {
+    public Tweet createPost(@NonNull String url, PostCheck check) {
         var id = getId(url);
 
         var tweet = new StandardTweet(id, check);
         repository.create(tweet);
+
+        return tweet;
     }
 
     private long getId(@NonNull String url) {

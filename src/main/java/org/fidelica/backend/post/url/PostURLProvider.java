@@ -9,7 +9,7 @@ public interface PostURLProvider<T extends Post> {
 
     Optional<T> getPostByURL(String url);
 
-    void createPost(String url, PostCheck check);
+    T createPost(String url, PostCheck check);
 
     boolean matches(String url);
 }
