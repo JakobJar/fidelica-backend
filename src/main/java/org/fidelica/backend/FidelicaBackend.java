@@ -110,8 +110,9 @@ public class FidelicaBackend extends AbstractModule {
                 get("/{id}", userController::getUserById);
             });
 
+            post("/report", postController::reportPost, AccessRole.AUTHENTICATED);
+
             path("/check", () -> {
-                post("/", postController::createPostCheck, AccessRole.AUTHENTICATED);
                 get("/<url>", postController::getByURL);
             });
 
