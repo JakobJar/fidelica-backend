@@ -10,6 +10,7 @@ import org.fidelica.backend.post.StandardPostCheck;
 import org.fidelica.backend.post.url.PostURLProvider;
 
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class PostController {
 
         PostCheckRating rating;
         try {
-            rating = PostCheckRating.valueOf(rawRating);
+            rating = PostCheckRating.valueOf(rawRating.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse("Rating is invalid.");
         }
