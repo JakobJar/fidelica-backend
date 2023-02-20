@@ -18,7 +18,7 @@ public class TwitterPostURLProvider implements PostURLProvider<Tweet> {
     public TwitterPostURLProvider(TwitterRepository repository) {
         this.repository = repository;
 
-        this.tweetPattern = Pattern.compile("https:\\\\/\\\\/twitter\\\\.com\\\\/\\\\w+\\\\/status\\\\/(\\\\d+)");
+        this.tweetPattern = Pattern.compile("^https?://(?:www\\.)?twitter\\.com/(?:#!/)?[a-zA-Z0-9_]{1,15}/status/(\\d+)(?:\\\\?.*)?$");
     }
 
     @Override

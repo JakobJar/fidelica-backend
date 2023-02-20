@@ -28,12 +28,12 @@ public class PostController {
 
         var postProvider = getProvider(url);
 
-        context.json(postProvider.getPostByURL(url));
+        context.json(postProvider.getPostByURL(url).orElseThrow(() -> new BadRequestResponse("Post not found.")));
     }
 
     // Only for testing
     public void reportPost(@NonNull Context context) {
-        var url = context.formParam("url");
+        var url = context.formParam("postURL");
         var rawRating = context.formParam("rating");
         var comment = context.formParam("comment");
         var rawRelatedFactChecks = context.formParams("relatedArticles");
@@ -55,8 +55,8 @@ public class PostController {
         }
 
         var postProvider = getProvider(url);
-        postProvider.createPost(url, new StandardPostCheck(rating, comment, relatedFactChecks));
-        context.json("Success.");
+        var post = postProvider.createPost(url, new StandardPostCheck(rating, comment, relatedFactChecks));
+        context.json(post);
     }
 
         private PostURLProvider<?> getProvider(@NonNull String url) {
