@@ -152,8 +152,10 @@ public class FidelicaBackend extends AbstractModule {
     private MongoClient createMongoClient(@NonNull @Named("MONGO URI") String mongoURI) {
         var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
-        var packages = new String[] { "org.fidelica.backend.user", "org.fidelica.backend.factcheck",
-                "org.fidelica.backend.post" };
+        var packages = new String[] { "org.fidelica.backend.user",
+                "org.fidelica.backend.user.login", "org.fidelica.backend.factcheck",
+                "org.fidelica.backend.factcheck.history", "org.fidelica.backend.history.difference",
+                "org.fidelica.backend.post", "org.fidelica.backend.post.twitter"};
 
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
