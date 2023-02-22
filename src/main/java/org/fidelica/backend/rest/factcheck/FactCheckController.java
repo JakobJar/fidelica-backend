@@ -71,6 +71,8 @@ public class FactCheckController {
     }
 
     public void getFactCheckById(@NonNull Context context) {
+        var preview = context.queryParamAsClass("preview", Boolean.class).getOrDefault(false);
+
         ObjectId id;
         try {
             id = new ObjectId(context.pathParam("factcheckId"));
@@ -78,10 +80,12 @@ public class FactCheckController {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var factCheck = repository.findById(id).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
+        var factCheckOptional = preview ? repository.findPreviewById(id) : repository.findById(id);
+
+        var factCheck = factCheckOptional.orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
         // TODO: Check permission.
         if (!factCheck.isVisible())
-            throw new NotFoundResponse("Article not found.");
+            throw new NotFoundResponse("FactCheck not found.");
 
         context.json(factCheck);
     }

@@ -43,6 +43,13 @@ public class StandardFactCheckRepository implements FactCheckRepository {
     }
 
     @Override
+    public Optional<FactCheck> findPreviewById(ObjectId id) {
+        return Optional.ofNullable(articles.find(eq("_id", id))
+                .projection(Projections.exclude("content"))
+                .first());
+    }
+
+    @Override
     public Optional<FactCheckEdit> findEditById(ObjectId id) {
         return Optional.ofNullable(edits.find(eq("_id", id)).first());
     }

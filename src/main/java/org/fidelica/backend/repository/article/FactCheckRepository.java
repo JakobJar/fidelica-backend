@@ -13,6 +13,8 @@ public interface FactCheckRepository {
 
     Optional<FactCheck> findById(ObjectId id);
 
+    Optional<FactCheck> findPreviewById(ObjectId id);
+
     Optional<FactCheckEdit> findEditById(ObjectId id);
 
     List<FactCheckEdit> getEditPreviews(ObjectId factcheckId, int limit, int offset);
