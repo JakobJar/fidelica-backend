@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
+import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.factcheck.FactCheckRating;
@@ -63,7 +64,7 @@ public class FactCheckController {
 
         User user = context.sessionAttribute("user");
         if (!permissionProcessor.hasPermission(user, "factcheck.create"))
-            throw new BadRequestResponse("You do not have permission to create fact checks.");
+            throw new UnauthorizedResponse("You do not have permission to create fact checks.");
 
         // TODO: Check language is valid.
         var article = new StandardFactCheck(ObjectId.get(), title, claim, rating, content, Locale.forLanguageTag(language));

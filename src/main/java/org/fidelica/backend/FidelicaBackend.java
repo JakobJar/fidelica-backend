@@ -39,6 +39,7 @@ import org.fidelica.backend.rest.routes.post.PostController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
 import org.fidelica.backend.user.UserModule;
+import org.fidelica.backend.user.group.GroupManager;
 import org.fidelica.backend.util.UtilModule;
 
 import java.net.http.HttpClient;
@@ -74,6 +75,9 @@ public class FidelicaBackend extends AbstractModule {
         var stage = Stage.valueOf(System.getenv().getOrDefault("STAGE", "PRODUCTION"));
         var injector = Guice.createInjector(stage, this, new UserModule(),
                 new UtilModule(), new RepositoryModule(), new FactCheckModule(), new PostModule());
+
+        var groupManager = injector.getInstance(GroupManager.class);
+        groupManager.reload();
 
         var app = injector.getInstance(Javalin.class);
 
@@ -153,7 +157,7 @@ public class FidelicaBackend extends AbstractModule {
         var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
         var packages = new String[] { "org.fidelica.backend.user",
-                "org.fidelica.backend.user.login", "org.fidelica.backend.factcheck",
+                "org.fidelica.backend.user.login", "org.fidelica.backend.user.group", "org.fidelica.backend.factcheck",
                 "org.fidelica.backend.factcheck.history", "org.fidelica.backend.history.difference",
                 "org.fidelica.backend.post", "org.fidelica.backend.post.twitter"};
 

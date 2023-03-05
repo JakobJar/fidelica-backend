@@ -2,6 +2,7 @@ package org.fidelica.backend.user.group;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 @Data
 @EqualsAndHashCode(of = "id")
 @BsonDiscriminator("StandardGroup")
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED, force = true)
 public class StandardGroup implements Group {
 
     @BsonId
