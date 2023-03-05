@@ -1,13 +1,11 @@
 package org.fidelica.backend.user.group;
 
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.fidelica.backend.repository.Identifiable;
 import org.fidelica.backend.user.permission.PermissionHolder;
 
-import java.util.Collection;
-
+@BsonDiscriminator
 public interface Group extends Identifiable, PermissionHolder {
 
     String getName();
-
-    Collection<String> getPermissions();
 }

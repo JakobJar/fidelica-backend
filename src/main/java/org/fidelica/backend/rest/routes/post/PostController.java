@@ -1,8 +1,9 @@
-package org.fidelica.backend.rest.post;
+package org.fidelica.backend.rest.routes.post;
 
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.NotFoundResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.post.PostCheckRating;
@@ -28,7 +29,7 @@ public class PostController {
 
         var postProvider = getProvider(url);
 
-        context.json(postProvider.getPostByURL(url).orElseThrow(() -> new BadRequestResponse("Post not found.")));
+        context.json(postProvider.getPostByURL(url).orElseThrow(() -> new NotFoundResponse("Post not found.")));
     }
 
     // Only for testing

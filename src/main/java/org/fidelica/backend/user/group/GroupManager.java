@@ -7,11 +7,13 @@ import java.util.Optional;
 
 public interface GroupManager {
 
+    void reload();
+
     void register(Group entity);
 
     void unregister(Group entity);
 
     Optional<Group> getById(ObjectId id);
 
-    Collection<Group> getEntities();
+    Collection<Group> getGroups();
 }

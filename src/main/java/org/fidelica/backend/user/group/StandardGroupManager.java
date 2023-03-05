@@ -3,24 +3,30 @@ package org.fidelica.backend.user.group;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
+import org.fidelica.backend.repository.user.GroupRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @NonNull
 public class StandardGroupManager implements GroupManager {
 
     private final Map<ObjectId, Group> groups;
 
+    private final GroupRepository repository;
+
     @Inject
-    public StandardGroupManager() {
-        this(new HashMap<>());
+    public StandardGroupManager(GroupRepository repository) {
+        this.groups = new ConcurrentHashMap<>();
+        this.repository = repository;
     }
 
-    public StandardGroupManager(Map<ObjectId, Group> groups) {
-        this.groups = groups;
+    @Override
+    public void reload() {
+        groups.clear();
+        repository.findAll().forEach(this::register);
     }
 
     @Override
@@ -39,7 +45,7 @@ public class StandardGroupManager implements GroupManager {
     }
 
     @Override
-    public Collection<Group> getEntities() {
+    public Collection<Group> getGroups() {
         return groups.values();
     }
 }

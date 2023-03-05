@@ -1,4 +1,4 @@
-package org.fidelica.backend.rest.factcheck;
+package org.fidelica.backend.rest.routes.factcheck;
 
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;

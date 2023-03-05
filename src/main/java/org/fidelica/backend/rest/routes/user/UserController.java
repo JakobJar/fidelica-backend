@@ -1,4 +1,4 @@
-package org.fidelica.backend.rest.user;
+package org.fidelica.backend.rest.routes.user;
 
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;

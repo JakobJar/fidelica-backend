@@ -30,14 +30,14 @@ import org.fidelica.backend.repository.RepositoryModule;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
 import org.fidelica.backend.rest.access.AccessRole;
 import org.fidelica.backend.rest.access.RestAccessManager;
-import org.fidelica.backend.rest.factcheck.FactCheckController;
-import org.fidelica.backend.rest.factcheck.FactCheckEditController;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
-import org.fidelica.backend.rest.post.PostController;
-import org.fidelica.backend.rest.user.UserAuthenticationController;
-import org.fidelica.backend.rest.user.UserController;
+import org.fidelica.backend.rest.routes.factcheck.FactCheckController;
+import org.fidelica.backend.rest.routes.factcheck.FactCheckEditController;
+import org.fidelica.backend.rest.routes.post.PostController;
+import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
+import org.fidelica.backend.rest.routes.user.UserController;
 import org.fidelica.backend.user.UserModule;
 import org.fidelica.backend.util.UtilModule;
 
@@ -117,7 +117,7 @@ public class FidelicaBackend extends AbstractModule {
             });
 
             path("/factcheck", () -> {
-                post("/", factCheckController::createFactCheck, AccessRole.AUTHENTICATED);
+                post("/", factCheckController::createFactCheck);
                 path("/{factcheckId}", () -> {
                     get("/", factCheckController::getFactCheckById);
                     get("/edits", factCheckEditController::getFactCheckEditPreviews);

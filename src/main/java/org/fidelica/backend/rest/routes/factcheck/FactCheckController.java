@@ -1,4 +1,4 @@
-package org.fidelica.backend.rest.factcheck;
+package org.fidelica.backend.rest.routes.factcheck;
 
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
@@ -12,6 +12,7 @@ import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
 import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
 import org.fidelica.backend.repository.article.FactCheckRepository;
 import org.fidelica.backend.user.User;
+import org.fidelica.backend.user.permission.UserPermissionProcessor;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -20,13 +21,16 @@ public class FactCheckController {
 
     private final FactCheckRepository repository;
     private final TextDifferenceProcessor textDifferenceProcessor;
+    private final UserPermissionProcessor permissionProcessor;
 
     private final Pattern textPattern;
 
     @Inject
-    public FactCheckController(@NonNull FactCheckRepository repository, @NonNull TextDifferenceProcessor textDifferenceProcessor) {
+    public FactCheckController(@NonNull FactCheckRepository repository, @NonNull TextDifferenceProcessor textDifferenceProcessor,
+                               @NonNull UserPermissionProcessor permissionProcessor) {
         this.repository = repository;
         this.textDifferenceProcessor = textDifferenceProcessor;
+        this.permissionProcessor = permissionProcessor;
 
         this.textPattern = Pattern.compile("^[\\x00-\\x7F]*$");
     }
@@ -57,8 +61,9 @@ public class FactCheckController {
         if (!textPattern.matcher(content).matches())
             throw new BadRequestResponse("Content contains invalid characters.");
 
-        // TODO: Check permission.
         User user = context.sessionAttribute("user");
+        if (!permissionProcessor.hasPermission(user, "factcheck.create"))
+            throw new BadRequestResponse("You do not have permission to create fact checks.");
 
         // TODO: Check language is valid.
         var article = new StandardFactCheck(ObjectId.get(), title, claim, rating, content, Locale.forLanguageTag(language));
@@ -81,10 +86,10 @@ public class FactCheckController {
         }
 
         var factCheckOptional = preview ? repository.findPreviewById(id) : repository.findById(id);
-
         var factCheck = factCheckOptional.orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
-        // TODO: Check permission.
-        if (!factCheck.isVisible())
+
+        User user = context.sessionAttribute("user");
+        if (!permissionProcessor.hasPermission(user, "factcheck.seehidden") && !factCheck.isVisible())
             throw new NotFoundResponse("FactCheck not found.");
 
         context.json(factCheck);
