@@ -107,6 +107,8 @@ public class FactCheckEditController {
 
         var edit = new StandardFactCheckEdit(ObjectId.get(), factCheckId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
         repository.createEdit(edit);
+
+        context.json(edit);
     }
 
     public void getEditPreviews(@NonNull Context context) {
