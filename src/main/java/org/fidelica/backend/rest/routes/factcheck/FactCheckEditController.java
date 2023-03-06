@@ -83,7 +83,7 @@ public class FactCheckEditController {
 
         var factCheck = repository.findById(factCheckId).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
 
-        if (!factCheck.isVisible() && !factCheck.isEditable()
+        if ((!factCheck.isVisible() || !factCheck.isEditable())
                 && !permissionProcessor.hasPermission(user, "factcheck.ignoreditable"))
             throw new BadRequestResponse("FactCheck is not editable.");
 
