@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.repositories.article;
+package org.fidelica.backend.repository.repositories.factcheck;
 
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
@@ -47,6 +47,11 @@ public class StandardFactCheckRepository implements FactCheckRepository {
         return Optional.ofNullable(articles.find(eq("_id", id))
                 .projection(Projections.exclude("content"))
                 .first());
+    }
+
+    @Override
+    public void createEdit(FactCheckEdit edit) {
+        edits.insertOne(edit);
     }
 
     @Override

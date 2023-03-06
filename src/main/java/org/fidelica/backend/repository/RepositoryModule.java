@@ -2,8 +2,8 @@ package org.fidelica.backend.repository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-import org.fidelica.backend.repository.repositories.article.FactCheckRepository;
-import org.fidelica.backend.repository.repositories.article.StandardFactCheckRepository;
+import org.fidelica.backend.repository.repositories.factcheck.FactCheckRepository;
+import org.fidelica.backend.repository.repositories.factcheck.StandardFactCheckRepository;
 import org.fidelica.backend.repository.repositories.post.twitter.StandardTwitterRepository;
 import org.fidelica.backend.repository.repositories.post.twitter.TwitterRepository;
 import org.fidelica.backend.repository.repositories.user.GroupRepository;

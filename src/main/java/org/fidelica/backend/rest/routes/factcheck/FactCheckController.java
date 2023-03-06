@@ -11,7 +11,7 @@ import org.fidelica.backend.factcheck.FactCheckRating;
 import org.fidelica.backend.factcheck.StandardFactCheck;
 import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
 import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
-import org.fidelica.backend.repository.repositories.article.FactCheckRepository;
+import org.fidelica.backend.repository.repositories.factcheck.FactCheckRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
 
@@ -45,6 +45,12 @@ public class FactCheckController {
 
         if (title == null || claim == null || rawRating == null || content == null || language == null)
             throw new BadRequestResponse("Invalid form data.");
+
+        title = title.trim();
+        claim = claim.trim();
+        rawRating = rawRating.trim();
+        content = content.trim();
+        language = language.trim();
 
         if (!textPattern.matcher(title).matches())
             throw new BadRequestResponse("Title contains invalid characters.");

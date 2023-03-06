@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.repositories.article;
+package org.fidelica.backend.repository.repositories.factcheck;
 
 import org.bson.types.ObjectId;
 import org.fidelica.backend.factcheck.FactCheck;
@@ -14,6 +14,8 @@ public interface FactCheckRepository {
     Optional<FactCheck> findById(ObjectId id);
 
     Optional<FactCheck> findPreviewById(ObjectId id);
+
+    void createEdit(FactCheckEdit edit);
 
     Optional<FactCheckEdit> findEditById(ObjectId id);
 
