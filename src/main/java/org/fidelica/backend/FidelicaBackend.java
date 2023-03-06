@@ -24,7 +24,7 @@ import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.fidelica.backend.factcheck.FactCheckModule;
+import org.fidelica.backend.article.ArticleModule;
 import org.fidelica.backend.post.PostModule;
 import org.fidelica.backend.repository.RepositoryModule;
 import org.fidelica.backend.repository.serialization.LocaleCodec;
@@ -33,8 +33,8 @@ import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
-import org.fidelica.backend.rest.routes.factcheck.FactCheckController;
-import org.fidelica.backend.rest.routes.factcheck.FactCheckEditController;
+import org.fidelica.backend.rest.routes.article.ArticleController;
+import org.fidelica.backend.rest.routes.article.ArticleEditController;
 import org.fidelica.backend.rest.routes.post.PostController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
@@ -74,7 +74,7 @@ public class FidelicaBackend extends AbstractModule {
     public void start() {
         var stage = Stage.valueOf(System.getenv().getOrDefault("STAGE", "PRODUCTION"));
         var injector = Guice.createInjector(stage, this, new UserModule(),
-                new UtilModule(), new RepositoryModule(), new FactCheckModule(), new PostModule());
+                new UtilModule(), new RepositoryModule(), new ArticleModule(), new PostModule());
 
         var groupManager = injector.getInstance(GroupManager.class);
         groupManager.reload();
@@ -99,8 +99,8 @@ public class FidelicaBackend extends AbstractModule {
         var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
         var userController = injector.getInstance(UserController.class);
         var postController = injector.getInstance(PostController.class);
-        var factCheckController = injector.getInstance(FactCheckController.class);
-        var factCheckEditController = injector.getInstance(FactCheckEditController.class);
+        var articleController = injector.getInstance(ArticleController.class);
+        var articleEditController = injector.getInstance(ArticleEditController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -120,14 +120,14 @@ public class FidelicaBackend extends AbstractModule {
                 get("/<url>", postController::getByURL);
             });
 
-            path("/factcheck", () -> {
-                post("/", factCheckController::createFactCheck, AccessRole.AUTHENTICATED);
-                path("/{factcheckId}", () -> {
-                    get("/", factCheckController::getFactCheckById);
-                    get("/edits", factCheckEditController::getEditPreviews);
+            path("/article", () -> {
+                post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
+                path("/{articleId}", () -> {
+                    get("/", articleController::getArticleById);
+                    get("/edits", articleEditController::getEditPreviews);
                     path("/edit", () -> {
-                        patch("/", factCheckEditController::createEdit);
-                        get("/<editId>", factCheckEditController::getEditById);
+                        patch("/", articleEditController::createEdit);
+                        get("/<editId>", articleEditController::getEditById);
                     });
                 });
             });
@@ -158,8 +158,8 @@ public class FidelicaBackend extends AbstractModule {
         var conventions = Arrays.asList(Conventions.ANNOTATION_CONVENTION,
                 Conventions.CLASS_AND_PROPERTY_CONVENTION, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
         var packages = new String[] { "org.fidelica.backend.user",
-                "org.fidelica.backend.user.login", "org.fidelica.backend.user.group", "org.fidelica.backend.factcheck",
-                "org.fidelica.backend.factcheck.history", "org.fidelica.backend.history.difference",
+                "org.fidelica.backend.user.login", "org.fidelica.backend.user.group", "org.fidelica.backend.article",
+                "org.fidelica.backend.article.history", "org.fidelica.backend.article.history.difference",
                 "org.fidelica.backend.post", "org.fidelica.backend.post.twitter"};
 
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();

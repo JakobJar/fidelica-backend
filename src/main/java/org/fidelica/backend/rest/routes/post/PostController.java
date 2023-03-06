@@ -37,7 +37,7 @@ public class PostController {
         var url = context.formParam("postURL");
         var rawRating = context.formParam("rating");
         var comment = context.formParam("comment");
-        var rawRelatedFactChecks = context.formParams("relatedArticles");
+        var rawRelatedArticles = context.formParams("relatedArticles");
 
         PostCheckRating rating;
         try {
@@ -46,9 +46,9 @@ public class PostController {
             throw new BadRequestResponse("Rating is invalid.");
         }
 
-        Set<ObjectId> relatedFactChecks;
+        Set<ObjectId> relatedArticles;
         try {
-            relatedFactChecks = rawRelatedFactChecks.stream()
+            relatedArticles = rawRelatedArticles.stream()
                     .map(ObjectId::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (IllegalArgumentException e) {
@@ -56,7 +56,7 @@ public class PostController {
         }
 
         var postProvider = getProvider(url);
-        var post = postProvider.createPost(url, new StandardPostCheck(rating, comment, relatedFactChecks));
+        var post = postProvider.createPost(url, new StandardPostCheck(rating, comment, relatedArticles));
         context.json(post);
     }
 

@@ -1,7 +1,7 @@
-package org.fidelica.backend.factcheck.history;
+package org.fidelica.backend.article.history;
 
-import org.fidelica.backend.factcheck.history.difference.LCSTextDifferenceProcessor;
-import org.fidelica.backend.factcheck.history.difference.StandardTextDifference;
+import org.fidelica.backend.article.history.difference.LCSTextDifferenceProcessor;
+import org.fidelica.backend.article.history.difference.StandardTextDifference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

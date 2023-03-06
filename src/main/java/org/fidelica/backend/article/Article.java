@@ -1,4 +1,4 @@
-package org.fidelica.backend.factcheck;
+package org.fidelica.backend.article;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.fidelica.backend.repository.Identifiable;
@@ -6,13 +6,13 @@ import org.fidelica.backend.repository.Identifiable;
 import java.util.Locale;
 
 @BsonDiscriminator
-public interface FactCheck extends Identifiable {
+public interface Article extends Identifiable {
 
     String getTitle();
 
     String getClaim();
 
-    FactCheckRating getRating();
+    ArticleRating getRating();
 
     String getContent();
 

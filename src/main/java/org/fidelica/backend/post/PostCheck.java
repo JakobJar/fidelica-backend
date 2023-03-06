@@ -12,5 +12,5 @@ public interface PostCheck {
 
     String getComment();
 
-    Collection<ObjectId> getRelatedFactChecks();
+    Collection<ObjectId> getRelatedArticles();
 }

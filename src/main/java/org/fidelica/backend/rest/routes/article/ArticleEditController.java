@@ -1,4 +1,4 @@
-package org.fidelica.backend.rest.routes.factcheck;
+package org.fidelica.backend.rest.routes.article;
 
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
@@ -7,30 +7,30 @@ import io.javalin.http.NotFoundResponse;
 import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.factcheck.FactCheckRating;
-import org.fidelica.backend.factcheck.history.ComputedFactCheckEdit;
-import org.fidelica.backend.factcheck.history.FactCheckEdit;
-import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
-import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
-import org.fidelica.backend.repository.repositories.factcheck.FactCheckRepository;
+import org.fidelica.backend.article.ArticleRating;
+import org.fidelica.backend.article.history.ArticleEdit;
+import org.fidelica.backend.article.history.ComputedArticleEdit;
+import org.fidelica.backend.article.history.StandardArticleEdit;
+import org.fidelica.backend.article.history.difference.TextDifferenceProcessor;
+import org.fidelica.backend.repository.repositories.article.ArticleRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
 
 import java.util.regex.Pattern;
 
 
-public class FactCheckEditController {
+public class ArticleEditController {
 
-    private final FactCheckRepository repository;
+    private final ArticleRepository repository;
     private final TextDifferenceProcessor textDifferenceProcessor;
     private final UserPermissionProcessor permissionProcessor;
 
     private final Pattern textPattern;
 
     @Inject
-    public FactCheckEditController(@NonNull FactCheckRepository repository,
-                                   @NonNull TextDifferenceProcessor textDifferenceProcessor,
-                                   @NonNull UserPermissionProcessor permissionProcessor) {
+    public ArticleEditController(@NonNull ArticleRepository repository,
+                                 @NonNull TextDifferenceProcessor textDifferenceProcessor,
+                                 @NonNull UserPermissionProcessor permissionProcessor) {
         this.repository = repository;
         this.textDifferenceProcessor = textDifferenceProcessor;
         this.permissionProcessor = permissionProcessor;
@@ -39,9 +39,9 @@ public class FactCheckEditController {
     }
 
     public void createEdit(@NonNull Context context) {
-        ObjectId factCheckId;
+        ObjectId articleId;
         try {
-            factCheckId = new ObjectId(context.pathParam("factcheckId"));
+            articleId = new ObjectId(context.pathParam("articleId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
@@ -64,9 +64,9 @@ public class FactCheckEditController {
         if (!textPattern.matcher(title).matches())
             throw new BadRequestResponse("Title contains invalid characters.");
 
-        FactCheckRating rating;
+        ArticleRating rating;
         try {
-            rating = FactCheckRating.valueOf(rawRating.toUpperCase());
+            rating = ArticleRating.valueOf(rawRating.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse("Invalid rating.");
         }
@@ -78,34 +78,34 @@ public class FactCheckEditController {
             throw new BadRequestResponse("Content contains invalid characters.");
 
         User user = context.sessionAttribute("user");
-        if (!permissionProcessor.hasPermission(user, "factcheck.edit"))
+        if (!permissionProcessor.hasPermission(user, "article.edit"))
             throw new UnauthorizedResponse("You do not have permission to edit fact checks.");
 
-        var factCheck = repository.findById(factCheckId).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
+        var article = repository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
 
-        if ((!factCheck.isVisible() || !factCheck.isEditable())
-                && !permissionProcessor.hasPermission(user, "factcheck.ignoreditable"))
-            throw new BadRequestResponse("FactCheck is not editable.");
+        if ((!article.isVisible() || !article.isEditable())
+                && !permissionProcessor.hasPermission(user, "article.ignoreditable"))
+            throw new BadRequestResponse("Article is not editable.");
 
         String newTitle = null;
         String newClaim = null;
-        FactCheckRating newRating = null;
+        ArticleRating newRating = null;
 
-        if (!factCheck.getTitle().equals(title))
+        if (!article.getTitle().equals(title))
             newTitle = title;
 
-        if (!factCheck.getRating().equals(rating))
+        if (!article.getRating().equals(rating))
             newRating = rating;
 
-        if (!factCheck.getClaim().equals(claim))
+        if (!article.getClaim().equals(claim))
             newClaim = claim;
 
-        var contentChanges = textDifferenceProcessor.getDifference(factCheck.getContent(), content);
+        var contentChanges = textDifferenceProcessor.getDifference(article.getContent(), content);
 
         if (newTitle == null && newClaim == null && newRating == null && contentChanges.size() == 0)
             throw new BadRequestResponse("No changes compared to current version.");
 
-        var edit = new StandardFactCheckEdit(ObjectId.get(), factCheckId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
+        var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
         repository.createEdit(edit);
 
         context.json(edit);
@@ -114,7 +114,7 @@ public class FactCheckEditController {
     public void getEditPreviews(@NonNull Context context) {
         ObjectId articleId;
         try {
-            articleId = new ObjectId(context.pathParam("factcheckId"));
+            articleId = new ObjectId(context.pathParam("articleId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
@@ -126,32 +126,32 @@ public class FactCheckEditController {
             throw new BadRequestResponse("Invalid page or limit.");
 
         // TODO: Check permission.
-        var factCheckPreviews = repository.getEditPreviews(articleId, page, limit);
-        context.json(factCheckPreviews);
+        var articlePreviews = repository.getEditPreviews(articleId, page, limit);
+        context.json(articlePreviews);
     }
 
     public void getEditById(@NonNull Context context) {
-        ObjectId factcheckId;
+        ObjectId articleId;
         ObjectId editId;
         try {
-            factcheckId = new ObjectId(context.pathParam("factcheckId"));
+            articleId = new ObjectId(context.pathParam("articleId"));
             editId = new ObjectId(context.pathParam("editId"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var factCheck = repository.findById(factcheckId).orElseThrow(() -> new NotFoundResponse("FactCheck not found."));
+        var article = repository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
         var edit = repository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
-        var editsAfter = repository.getEditDifferencesAfter(factcheckId, editId);
+        var editsAfter = repository.getEditDifferencesAfter(articleId, editId);
 
-        var newContent = factCheck.getContent();
-        for (FactCheckEdit editAfter : editsAfter) {
+        var newContent = article.getContent();
+        for (ArticleEdit editAfter : editsAfter) {
             newContent = textDifferenceProcessor.applyDifferences(newContent, editAfter.getDifferences());
         }
         var oldContent = textDifferenceProcessor.applyDifferences(newContent, edit.getDifferences());
 
-        var computedEdit = new ComputedFactCheckEdit(edit, oldContent, newContent);
+        var computedEdit = new ComputedArticleEdit(edit, oldContent, newContent);
         context.json(computedEdit);
     }
 }

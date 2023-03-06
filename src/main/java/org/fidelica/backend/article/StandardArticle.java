@@ -1,4 +1,4 @@
-package org.fidelica.backend.factcheck;
+package org.fidelica.backend.article;
 
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
@@ -10,27 +10,27 @@ import java.util.Locale;
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
-@BsonDiscriminator("StandardFactCheck")
-public class StandardFactCheck implements FactCheck {
+@BsonDiscriminator("StandardArticle")
+public class StandardArticle implements Article {
 
     @BsonId
     private final ObjectId id;
     private String title;
     private String claim;
-    private FactCheckRating rating;
+    private ArticleRating rating;
     private String content;
     private final Locale language;
 
     private boolean visible;
     private boolean editable;
 
-    public StandardFactCheck(ObjectId id, String title, String claim, FactCheckRating rating, String content, Locale language) {
+    public StandardArticle(ObjectId id, String title, String claim, ArticleRating rating, String content, Locale language) {
         this(id, title, claim, rating, content, language, false, true);
     }
 
-    public StandardFactCheck(@NonNull ObjectId id, @NonNull String title, @NonNull String claim,
-                             @NonNull FactCheckRating rating, @NonNull String content,
-                             @NonNull Locale language, boolean visible, boolean editable) {
+    public StandardArticle(@NonNull ObjectId id, @NonNull String title, @NonNull String claim,
+                           @NonNull ArticleRating rating, @NonNull String content,
+                           @NonNull Locale language, boolean visible, boolean editable) {
         this.id = id;
         this.title = title;
         this.claim = claim;

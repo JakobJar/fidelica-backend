@@ -1,4 +1,4 @@
-package org.fidelica.backend.factcheck.history.difference;
+package org.fidelica.backend.article.history.difference;
 
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;

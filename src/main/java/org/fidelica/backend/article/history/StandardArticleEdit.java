@@ -1,12 +1,12 @@
-package org.fidelica.backend.factcheck.history;
+package org.fidelica.backend.article.history;
 
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.factcheck.FactCheckRating;
-import org.fidelica.backend.factcheck.history.difference.TextDifference;
+import org.fidelica.backend.article.ArticleRating;
+import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,15 +16,15 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @BsonDiscriminator("StandardArticleEdit")
-public class StandardFactCheckEdit implements FactCheckEdit {
+public class StandardArticleEdit implements ArticleEdit {
 
     @BsonId
     private final ObjectId id;
-    private final ObjectId factCheckId;
+    private final ObjectId articleId;
     private final String description;
     private String title;
     private String claim;
-    private FactCheckRating rating;
+    private ArticleRating rating;
     private final List<TextDifference> differences;
     private final ObjectId editorId;
 
@@ -32,18 +32,18 @@ public class StandardFactCheckEdit implements FactCheckEdit {
     private ObjectId checkerId;
     private String comment;
 
-    public StandardFactCheckEdit(ObjectId id, ObjectId factCheckId, String description,
-                                 String title, String claim, FactCheckRating rating,
-                                 List<TextDifference> differences, ObjectId editorId) {
-        this(id, factCheckId, description, title, claim, rating, differences, editorId, false, null, null);
+    public StandardArticleEdit(ObjectId id, ObjectId articleId, String description,
+                               String title, String claim, ArticleRating rating,
+                               List<TextDifference> differences, ObjectId editorId) {
+        this(id, articleId, description, title, claim, rating, differences, editorId, false, null, null);
     }
 
-    public StandardFactCheckEdit(@NonNull ObjectId id, @NonNull ObjectId factCheckId, @NonNull String description,
-                                 String title, String claim, FactCheckRating rating,
-                                 @NonNull List<TextDifference> differences, @NonNull ObjectId editorId,
-                                 boolean approved, ObjectId checkerId, String comment) {
+    public StandardArticleEdit(@NonNull ObjectId id, @NonNull ObjectId articleId, @NonNull String description,
+                               String title, String claim, ArticleRating rating,
+                               @NonNull List<TextDifference> differences, @NonNull ObjectId editorId,
+                               boolean approved, ObjectId checkerId, String comment) {
         this.id = id;
-        this.factCheckId = factCheckId;
+        this.articleId = articleId;
         this.description = description;
         this.title = title;
         this.claim = claim;

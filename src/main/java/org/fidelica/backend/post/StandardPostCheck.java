@@ -17,15 +17,15 @@ public class StandardPostCheck implements PostCheck {
 
         private PostCheckRating rating;
         private String comment;
-        private final Collection<ObjectId> relatedFactChecks;
+        private final Collection<ObjectId> relatedArticles;
 
         public StandardPostCheck(PostCheckRating rating, String comment) {
             this(rating, comment, new LinkedHashSet<>());
         }
 
-        public StandardPostCheck(@NonNull PostCheckRating rating, String comment, @NonNull Collection<ObjectId> relatedFactChecks) {
+        public StandardPostCheck(@NonNull PostCheckRating rating, String comment, @NonNull Collection<ObjectId> relatedArticles) {
             this.rating = rating;
             this.comment = comment;
-            this.relatedFactChecks = relatedFactChecks;
+            this.relatedArticles = relatedArticles;
         }
 }

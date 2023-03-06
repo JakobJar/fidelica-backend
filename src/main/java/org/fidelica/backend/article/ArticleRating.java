@@ -1,9 +1,9 @@
-package org.fidelica.backend.factcheck;
+package org.fidelica.backend.article;
 
 import lombok.Getter;
 
 @Getter
-public enum FactCheckRating {
+public enum ArticleRating {
 
     TRUE("True"),
     MOSTLY_TRUE("Mostly true"),
@@ -13,7 +13,7 @@ public enum FactCheckRating {
 
     private final String displayName;
 
-    FactCheckRating(String displayName) {
+    ArticleRating(String displayName) {
         this.displayName = displayName;
     }
 }

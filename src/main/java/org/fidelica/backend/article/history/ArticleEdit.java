@@ -1,22 +1,22 @@
-package org.fidelica.backend.factcheck.history;
+package org.fidelica.backend.article.history;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.factcheck.FactCheckRating;
-import org.fidelica.backend.factcheck.history.difference.TextDifference;
+import org.fidelica.backend.article.ArticleRating;
+import org.fidelica.backend.article.history.difference.TextDifference;
 import org.fidelica.backend.repository.Identifiable;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @BsonDiscriminator
-public interface FactCheckEdit extends Identifiable {
+public interface ArticleEdit extends Identifiable {
 
-    ObjectId getFactCheckId();
+    ObjectId getArticleId();
 
     String getClaim();
 
-    FactCheckRating getRating();
+    ArticleRating getRating();
 
     List<TextDifference> getDifferences();
 
