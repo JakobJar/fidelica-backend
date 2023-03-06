@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.user;
+package org.fidelica.backend.repository.repositories.user;
 
 import org.fidelica.backend.user.group.Group;
 

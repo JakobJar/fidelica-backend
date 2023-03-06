@@ -6,7 +6,7 @@ import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.repository.user.UserRepository;
+import org.fidelica.backend.repository.repositories.user.UserRepository;
 import org.fidelica.backend.user.User;
 
 public class UserController {

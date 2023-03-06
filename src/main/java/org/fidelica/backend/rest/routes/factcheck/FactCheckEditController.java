@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 import org.fidelica.backend.factcheck.history.ComputedFactCheckEdit;
 import org.fidelica.backend.factcheck.history.FactCheckEdit;
 import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
-import org.fidelica.backend.repository.article.FactCheckRepository;
+import org.fidelica.backend.repository.repositories.article.FactCheckRepository;
 
 
 public class FactCheckEditController {

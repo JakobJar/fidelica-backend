@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.article;
+package org.fidelica.backend.repository.repositories.article;
 
 import org.bson.types.ObjectId;
 import org.fidelica.backend.factcheck.FactCheck;

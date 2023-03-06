@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.post.twitter;
+package org.fidelica.backend.repository.repositories.post.twitter;
 
 import org.fidelica.backend.post.twitter.Tweet;
 

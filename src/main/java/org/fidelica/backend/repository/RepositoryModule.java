@@ -2,14 +2,14 @@ package org.fidelica.backend.repository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-import org.fidelica.backend.repository.article.FactCheckRepository;
-import org.fidelica.backend.repository.article.StandardFactCheckRepository;
-import org.fidelica.backend.repository.post.twitter.StandardTwitterRepository;
-import org.fidelica.backend.repository.post.twitter.TwitterRepository;
-import org.fidelica.backend.repository.user.GroupRepository;
-import org.fidelica.backend.repository.user.StandardGroupRepository;
-import org.fidelica.backend.repository.user.StandardUserRepository;
-import org.fidelica.backend.repository.user.UserRepository;
+import org.fidelica.backend.repository.repositories.article.FactCheckRepository;
+import org.fidelica.backend.repository.repositories.article.StandardFactCheckRepository;
+import org.fidelica.backend.repository.repositories.post.twitter.StandardTwitterRepository;
+import org.fidelica.backend.repository.repositories.post.twitter.TwitterRepository;
+import org.fidelica.backend.repository.repositories.user.GroupRepository;
+import org.fidelica.backend.repository.repositories.user.StandardGroupRepository;
+import org.fidelica.backend.repository.repositories.user.StandardUserRepository;
+import org.fidelica.backend.repository.repositories.user.UserRepository;
 
 public class RepositoryModule extends AbstractModule {
 

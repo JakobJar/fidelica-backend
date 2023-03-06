@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import lombok.NonNull;
 import org.fidelica.backend.post.PostCheck;
 import org.fidelica.backend.post.url.PostURLProvider;
-import org.fidelica.backend.repository.post.twitter.TwitterRepository;
+import org.fidelica.backend.repository.repositories.post.twitter.TwitterRepository;
 
 import java.util.Optional;
 import java.util.regex.Pattern;

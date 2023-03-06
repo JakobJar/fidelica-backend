@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.user;
+package org.fidelica.backend.repository.repositories.user;
 
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;

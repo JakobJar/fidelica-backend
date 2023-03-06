@@ -3,7 +3,7 @@ package org.fidelica.backend.user.group;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.repository.user.GroupRepository;
+import org.fidelica.backend.repository.repositories.user.GroupRepository;
 
 import java.util.Collection;
 import java.util.Map;

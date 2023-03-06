@@ -8,7 +8,7 @@ import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.repository.user.UserRepository;
+import org.fidelica.backend.repository.repositories.user.UserRepository;
 import org.fidelica.backend.user.StandardUser;
 import org.fidelica.backend.user.login.PasswordHandler;
 import org.fidelica.backend.user.login.PasswordHash;

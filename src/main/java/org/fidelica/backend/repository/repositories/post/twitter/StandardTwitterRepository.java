@@ -1,4 +1,4 @@
-package org.fidelica.backend.repository.post.twitter;
+package org.fidelica.backend.repository.repositories.post.twitter;
 
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;

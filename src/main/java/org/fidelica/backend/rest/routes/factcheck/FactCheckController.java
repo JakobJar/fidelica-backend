@@ -11,7 +11,7 @@ import org.fidelica.backend.factcheck.FactCheckRating;
 import org.fidelica.backend.factcheck.StandardFactCheck;
 import org.fidelica.backend.factcheck.history.StandardFactCheckEdit;
 import org.fidelica.backend.factcheck.history.difference.TextDifferenceProcessor;
-import org.fidelica.backend.repository.article.FactCheckRepository;
+import org.fidelica.backend.repository.repositories.article.FactCheckRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
 
