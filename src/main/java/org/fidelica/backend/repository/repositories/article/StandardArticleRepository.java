@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
 import lombok.NonNull;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.Article;
@@ -60,12 +61,25 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public List<ArticleEdit> getPendingEditPreviews(int limit, int offset) {
-        return edits.find(eq("approved", false))
+    public List<ArticleEdit> getUncheckedEditPreviews(int limit, int offset) {
+        return edits.find(eq("checkerId", null))
                 .projection(EDIT_PREVIEW_PROJECTION)
                 .skip(offset * limit)
                 .limit(limit)
                 .into(new ArrayList<>());
+    }
+
+    @Override
+    public boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment) {
+        var changes = new Document();
+        changes.append("approved", approve);
+        changes.append("checkerId", checkerId);
+        changes.append("comment", comment);
+
+        // TODO: Remove other pending edits
+
+        return edits.updateOne(and(eq("_id", id), eq("checkerId", null)),
+                changes).wasAcknowledged();
     }
 
     @Override

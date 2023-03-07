@@ -19,7 +19,9 @@ public interface ArticleRepository {
 
     Optional<ArticleEdit> findEditById(ObjectId id);
 
-    List<ArticleEdit> getPendingEditPreviews(int limit, int offset);
+    boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment);
+
+    List<ArticleEdit> getUncheckedEditPreviews(int limit, int offset);
 
     List<ArticleEdit> getEditPreviews(ObjectId articleId, int limit, int offset);
 
