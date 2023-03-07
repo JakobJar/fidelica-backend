@@ -60,6 +60,15 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
+    public List<ArticleEdit> getPendingEditPreviews(int limit, int offset) {
+        return edits.find(eq("approved", false))
+                .projection(EDIT_PREVIEW_PROJECTION)
+                .skip(offset * limit)
+                .limit(limit)
+                .into(new ArrayList<>());
+    }
+
+    @Override
     public List<ArticleEdit> getEditPreviews(ObjectId articleId, int limit, int offset) {
         return edits.find(eq("articleId", articleId))
                 .projection(EDIT_PREVIEW_PROJECTION)

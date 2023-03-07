@@ -19,6 +19,8 @@ public interface ArticleRepository {
 
     Optional<ArticleEdit> findEditById(ObjectId id);
 
+    List<ArticleEdit> getPendingEditPreviews(int limit, int offset);
+
     List<ArticleEdit> getEditPreviews(ObjectId articleId, int limit, int offset);
 
     List<ArticleEdit> getEditDifferencesAfter(ObjectId articleId, ObjectId editId);
