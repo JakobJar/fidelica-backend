@@ -102,7 +102,7 @@ public class ArticleEditController {
 
         var contentChanges = textDifferenceProcessor.getDifference(article.getContent(), content);
 
-        if (newTitle == null && newClaim == null && newRating == null && contentChanges.size() == 0)
+        if (newTitle == null && newClaim == null && newRating == null && contentChanges.isEmpty())
             throw new BadRequestResponse("No changes compared to current version.");
 
         var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getId());

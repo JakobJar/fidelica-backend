@@ -35,6 +35,7 @@ import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.routes.article.ArticleController;
 import org.fidelica.backend.rest.routes.article.ArticleEditController;
+import org.fidelica.backend.rest.routes.moderation.ArticleModerationController;
 import org.fidelica.backend.rest.routes.post.PostController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
@@ -101,6 +102,7 @@ public class FidelicaBackend extends AbstractModule {
         var postController = injector.getInstance(PostController.class);
         var articleController = injector.getInstance(ArticleController.class);
         var articleEditController = injector.getInstance(ArticleEditController.class);
+        var articleModerationController = injector.getInstance(ArticleModerationController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -126,10 +128,14 @@ public class FidelicaBackend extends AbstractModule {
                     get("/", articleController::getArticleById);
                     get("/edits", articleEditController::getEditPreviews);
                     path("/edit", () -> {
-                        patch("/", articleEditController::createEdit);
+                        post("/", articleEditController::createEdit);
                         get("/<editId>", articleEditController::getEditById);
                     });
                 });
+            });
+
+            path("/moderation", () -> {
+                get("/edits", articleModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
             });
         });
     }
