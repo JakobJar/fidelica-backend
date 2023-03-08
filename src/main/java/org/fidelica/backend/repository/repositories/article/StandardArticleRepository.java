@@ -76,10 +76,21 @@ public class StandardArticleRepository implements ArticleRepository {
         changes.append("checkerId", checkerId);
         changes.append("comment", comment);
 
-        // TODO: Remove other pending edits
+        var edit = edits.findOneAndUpdate(and(eq("_id", id), eq("checkerId", null)), changes);
+        if (edit == null)
+            return false;
 
-        return edits.updateOne(and(eq("_id", id), eq("checkerId", null)),
-                changes).wasAcknowledged();
+        if (!approve)
+            return true;
+
+        // Disproves other edits, so there aren't merge conflicts
+        var otherChanges = new Document();
+        changes.append("approve", false);
+        changes.append("checkerId", checkerId);
+        changes.append("comment", "Changes were overwritten by edit " + edit.getId());
+        edits.updateMany(and(eq("articleId", edit.getArticleId()), eq("checkerId", null)),
+                otherChanges);
+        return true;
     }
 
     @Override
