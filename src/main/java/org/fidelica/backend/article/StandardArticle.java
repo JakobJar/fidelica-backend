@@ -16,7 +16,7 @@ public class StandardArticle implements Article {
     @BsonId
     private final ObjectId id;
     private String title;
-    private String claim;
+    private String shortDescription;
     private ArticleRating rating;
     private String content;
     private final Locale language;
@@ -24,16 +24,16 @@ public class StandardArticle implements Article {
     private boolean visible;
     private boolean editable;
 
-    public StandardArticle(ObjectId id, String title, String claim, ArticleRating rating, String content, Locale language) {
-        this(id, title, claim, rating, content, language, false, true);
+    public StandardArticle(ObjectId id, String title, String description, ArticleRating rating, String content, Locale language) {
+        this(id, title, description, rating, content, language, false, true);
     }
 
-    public StandardArticle(@NonNull ObjectId id, @NonNull String title, @NonNull String claim,
+    public StandardArticle(@NonNull ObjectId id, @NonNull String title, @NonNull String description,
                            @NonNull ArticleRating rating, @NonNull String content,
                            @NonNull Locale language, boolean visible, boolean editable) {
         this.id = id;
         this.title = title;
-        this.claim = claim;
+        this.shortDescription = description;
         this.rating = rating;
         this.content = content;
         this.language = language;

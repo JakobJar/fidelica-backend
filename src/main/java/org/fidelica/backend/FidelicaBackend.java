@@ -128,7 +128,7 @@ public class FidelicaBackend extends AbstractModule {
                     get("/", articleController::getArticleById);
                     get("/edits", articleEditController::getEditPreviews);
                     path("/edit", () -> {
-                        post("/", articleEditController::createEdit);
+                        post("/", articleEditController::createEdit, AccessRole.AUTHENTICATED);
                         get("/<editId>", articleEditController::getEditById);
                     });
                 });
@@ -153,6 +153,7 @@ public class FidelicaBackend extends AbstractModule {
                 corsContainer.add(corsConfig -> {
                     corsConfig.allowHost("https://fidelica.org", "http://localhost:8080", "http://127.0.0.1:8080");
                     corsConfig.allowCredentials = true;
+                    corsConfig.reflectClientOrigin = true;
                 });
             });
         });

@@ -14,7 +14,7 @@ public interface ArticleEdit extends Identifiable {
 
     ObjectId getArticleId();
 
-    String getClaim();
+    String getShortDescription();
 
     ArticleRating getRating();
 

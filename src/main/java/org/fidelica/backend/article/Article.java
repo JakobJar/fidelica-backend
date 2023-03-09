@@ -10,7 +10,7 @@ public interface Article extends Identifiable {
 
     String getTitle();
 
-    String getClaim();
+    String getShortDescription();
 
     ArticleRating getRating();
 

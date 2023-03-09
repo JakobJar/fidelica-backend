@@ -97,7 +97,7 @@ public class ArticleEditController {
         if (!article.getRating().equals(rating))
             newRating = rating;
 
-        if (!article.getClaim().equals(claim))
+        if (!article.getShortDescription().equals(claim))
             newClaim = claim;
 
         var contentChanges = textDifferenceProcessor.getDifference(article.getContent(), content);
