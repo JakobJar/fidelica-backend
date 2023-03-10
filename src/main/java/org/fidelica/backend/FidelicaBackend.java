@@ -151,9 +151,9 @@ public class FidelicaBackend extends AbstractModule {
             config.plugins.enableHttpAllowedMethodsOnRoutes();
             config.plugins.enableCors(corsContainer -> {
                 corsContainer.add(corsConfig -> {
-                    corsConfig.allowHost("https://fidelica.org", "http://localhost:8080", "http://127.0.0.1:8080");
+                    corsConfig.allowHost("https://fidelica.org", "http://localhost:8080",
+                            "http://127.0.0.1:8080", "http://localhost:3000", "http://127.0.0.1:3000");
                     corsConfig.allowCredentials = true;
-                    corsConfig.reflectClientOrigin = true;
                 });
             });
         });
