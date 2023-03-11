@@ -2,7 +2,9 @@ package org.fidelica.backend.repository.repositories.article;
 
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.Article;
+import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.ArticleEdit;
+import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +17,17 @@ public interface ArticleRepository {
 
     Optional<Article> findPreviewById(ObjectId id);
 
+    boolean update(ObjectId id, String title, String shortDescription, String content, ArticleRating rating);
+
     void createEdit(ArticleEdit edit);
 
     Optional<ArticleEdit> findEditById(ObjectId id);
 
+    boolean updateEditDifferences(ObjectId id, List<TextDifference> differences);
+
     boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment);
+
+    void disproveOtherEdits(ObjectId articleId, ObjectId editId, ObjectId checkerId);
 
     List<ArticleEdit> getUncheckedEditPreviews(int limit, int offset);
 

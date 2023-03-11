@@ -129,7 +129,10 @@ public class FidelicaBackend extends AbstractModule {
                     get("/edits", articleEditController::getEditPreviews);
                     path("/edit", () -> {
                         post("/", articleEditController::createEdit, AccessRole.AUTHENTICATED);
-                        get("/<editId>", articleEditController::getEditById);
+                        path("/{editId}", () -> {
+                            get("/", articleEditController::getEditById);
+                            post("/check", articleModerationController::checkEdit, AccessRole.AUTHENTICATED);
+                        });
                     });
                 });
             });

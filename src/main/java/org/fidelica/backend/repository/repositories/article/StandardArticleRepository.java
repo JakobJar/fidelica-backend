@@ -5,12 +5,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import lombok.NonNull;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.Article;
+import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.ArticleEdit;
+import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,21 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
+    public boolean update(@NonNull ObjectId id, String title, String shortDescription, String content, ArticleRating rating) {
+        List<Bson> changes = new ArrayList<>();
+        if (title != null)
+            changes.add(Updates.set("title", title));
+        if (shortDescription != null)
+            changes.add(Updates.set("shortDescription", shortDescription));
+        if (content != null)
+            changes.add(Updates.set("content", content));
+        if (rating != null)
+            changes.add(Updates.set("rating", rating));
+
+        return articles.updateOne(eq("_id", id), Updates.combine(changes)).wasAcknowledged();
+    }
+
+    @Override
     public void createEdit(ArticleEdit edit) {
         edits.insertOne(edit);
     }
@@ -58,6 +75,12 @@ public class StandardArticleRepository implements ArticleRepository {
     @Override
     public Optional<ArticleEdit> findEditById(ObjectId id) {
         return Optional.ofNullable(edits.find(eq("_id", id)).first());
+    }
+
+    @Override
+    public boolean updateEditDifferences(ObjectId id, List<TextDifference> differences) {
+        var changes = Updates.set("differences", differences);
+        return edits.updateOne(eq("_id", id), changes).wasAcknowledged();
     }
 
     @Override
@@ -71,26 +94,21 @@ public class StandardArticleRepository implements ArticleRepository {
 
     @Override
     public boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment) {
-        var changes = new Document();
-        changes.append("approved", approve);
-        changes.append("checkerId", checkerId);
-        changes.append("comment", comment);
+        var changes = Updates.combine(Updates.set("approve", approve),
+                Updates.set("checkerId", checkerId),
+                Updates.set("comment", comment));
+        return edits.updateOne(and(eq("_id", id), eq("checkerId", null)), changes)
+                .wasAcknowledged();
+    }
 
-        var edit = edits.findOneAndUpdate(and(eq("_id", id), eq("checkerId", null)), changes);
-        if (edit == null)
-            return false;
-
-        if (!approve)
-            return true;
-
-        // Disproves other edits, so there aren't merge conflicts
-        var otherChanges = new Document();
-        changes.append("approve", false);
-        changes.append("checkerId", checkerId);
-        changes.append("comment", "Changes were overwritten by edit " + edit.getId());
-        edits.updateMany(and(eq("articleId", edit.getArticleId()), eq("checkerId", null)),
-                otherChanges);
-        return true;
+    @Override
+    public void disproveOtherEdits(ObjectId articleId, ObjectId editId, ObjectId checkerId) {
+        var changes = Updates.combine(
+                Updates.set("approve", false),
+                Updates.set("checkerId", checkerId),
+                Updates.set("comment", "Changes were overwritten by edit " + editId));
+        edits.updateMany(and(eq("articleId", articleId), ne("_id", editId)),
+                changes);
     }
 
     @Override

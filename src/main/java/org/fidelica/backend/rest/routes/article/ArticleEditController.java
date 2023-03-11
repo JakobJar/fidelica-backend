@@ -47,16 +47,16 @@ public class ArticleEditController {
         }
 
         var title = context.formParam("title");
-        var claim = context.formParam("claim");
+        var shortDescription = context.formParam("shortDescription");
         var rawRating = context.formParam("rating");
         var content = context.formParam("content");
         var description = context.formParam("description");
 
-        if (title == null || claim == null || rawRating == null || content == null || description == null)
+        if (title == null || shortDescription == null || rawRating == null || content == null || description == null)
             throw new BadRequestResponse("Invalid form data.");
 
         title = title.trim();
-        claim = claim.trim();
+        shortDescription = shortDescription.trim();
         rawRating = rawRating.trim();
         content = content.trim();
         description = description.trim();
@@ -71,7 +71,7 @@ public class ArticleEditController {
             throw new BadRequestResponse("Invalid rating.");
         }
 
-        if (!textPattern.matcher(claim).matches())
+        if (!textPattern.matcher(shortDescription).matches())
             throw new BadRequestResponse("Claim contains invalid characters.");
 
         if (!textPattern.matcher(content).matches())
@@ -97,8 +97,8 @@ public class ArticleEditController {
         if (!article.getRating().equals(rating))
             newRating = rating;
 
-        if (!article.getShortDescription().equals(claim))
-            newClaim = claim;
+        if (!article.getShortDescription().equals(shortDescription))
+            newClaim = shortDescription;
 
         var contentChanges = textDifferenceProcessor.getDifference(article.getContent(), content);
 

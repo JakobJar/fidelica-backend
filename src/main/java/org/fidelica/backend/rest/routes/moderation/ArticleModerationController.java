@@ -1,26 +1,32 @@
 package org.fidelica.backend.rest.routes.moderation;
 
 import com.google.inject.Inject;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ConflictResponse;
-import io.javalin.http.Context;
-import io.javalin.http.UnauthorizedResponse;
+import io.javalin.http.*;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
+import org.fidelica.backend.article.history.difference.TextDifferenceProcessor;
 import org.fidelica.backend.repository.repositories.article.ArticleRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
+import org.fidelica.backend.util.LockMap;
 
 public class ArticleModerationController {
 
     private final ArticleRepository articleRepository;
+    private final TextDifferenceProcessor differenceProcessor;
     private final UserPermissionProcessor permissionProcessor;
+
+    private final LockMap<ObjectId> editLocks;
 
     @Inject
     public ArticleModerationController(@NonNull ArticleRepository articleRepository,
+                                       @NonNull TextDifferenceProcessor differenceProcessor,
                                        @NonNull UserPermissionProcessor permissionProcessor) {
         this.articleRepository = articleRepository;
+        this.differenceProcessor = differenceProcessor;
         this.permissionProcessor = permissionProcessor;
+
+        this.editLocks = new LockMap<>();
     }
 
     public void getPendingEdits(@NonNull Context context) {
@@ -46,7 +52,7 @@ public class ArticleModerationController {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var approve = context.formParamAsClass("approve", Boolean.class)
+        boolean approve = context.formParamAsClass("approve", Boolean.class)
                 .getOrThrow(unused -> new BadRequestResponse("Invalid form data."));
         var comment = context.formParam("comment");
         if (comment == null)
@@ -56,10 +62,28 @@ public class ArticleModerationController {
         if (!permissionProcessor.hasPermission(user, "article.edit.check"))
             throw new UnauthorizedResponse("You're not permitted to approve edits.");
 
-        var success = articleRepository.checkEdit(editId, approve, user.getId(), comment);
-        if (!success)
-            throw new ConflictResponse("Edit wasn't found or is already checked.");
+        editLocks.lock(editId);
+        try {
+            var success = articleRepository.checkEdit(editId, approve, user.getId(), comment);
+            if (!success)
+                throw new ConflictResponse("Edit wasn't found or is already checked.");
 
-        context.json("Success");
+            if (approve) {
+                var edit = articleRepository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
+
+                articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
+
+                var article = articleRepository.findById(edit.getArticleId()).orElseThrow(() -> new NotFoundResponse("Article not found."));
+
+                var newContent = differenceProcessor.applyDifferences(article.getContent(), edit.getDifferences());
+                var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
+
+                articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
+                articleRepository.updateEditDifferences(editId, newDifferences);
+                context.json(article);
+            }
+        } finally {
+            editLocks.unlock(editId);
+        }
     }
 }

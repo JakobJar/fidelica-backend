@@ -38,16 +38,16 @@ public class ArticleController {
 
     public void createArticle(@NonNull Context context) {
         var title = context.formParam("title");
-        var claim = context.formParam("claim");
+        var shortDescription = context.formParam("shortDescription");
         var rawRating = context.formParam("rating");
         var content = context.formParam("content");
         var language = context.formParam("language");
 
-        if (title == null || claim == null || rawRating == null || content == null || language == null)
+        if (title == null || shortDescription == null || rawRating == null || content == null || language == null)
             throw new BadRequestResponse("Invalid form data.");
 
         title = title.trim();
-        claim = claim.trim();
+        shortDescription = shortDescription.trim();
         rawRating = rawRating.trim();
         content = content.trim();
         language = language.trim();
@@ -62,7 +62,7 @@ public class ArticleController {
             throw new BadRequestResponse("Invalid rating.");
         }
 
-        if (!textPattern.matcher(claim).matches())
+        if (!textPattern.matcher(shortDescription).matches())
             throw new BadRequestResponse("Claim contains invalid characters.");
 
         if (!textPattern.matcher(content).matches())
@@ -73,10 +73,10 @@ public class ArticleController {
             throw new UnauthorizedResponse("You do not have permission to create fact checks.");
 
         // TODO: Check language is valid.
-        var article = new StandardArticle(ObjectId.get(), title, claim, rating, content, Locale.forLanguageTag(language));
+        var article = new StandardArticle(ObjectId.get(), title, shortDescription, rating, content, Locale.forLanguageTag(language));
 
         var difference = textDifferenceProcessor.getDifference(content, "");
-        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getId(), "Create article.", title, claim, rating, difference, user.getId());
+        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getId(), "Create article.", title, shortDescription, rating, difference, user.getId());
 
         repository.create(article, firstEdit);
         context.json(article);
