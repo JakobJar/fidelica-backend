@@ -108,8 +108,11 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public boolean isFirstEdit(ObjectId edit, ObjectId id) {
-        return false;
+    public boolean isFirstEdit(ObjectId articleId, ObjectId id) {
+        var result = edits.find(eq("articleId", articleId))
+                .projection(Projections.include("_id"))
+                .into(new ArrayList<>());
+        return result.size() == 1 && result.get(0).getId().equals(id);
     }
 
     @Override

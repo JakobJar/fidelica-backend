@@ -71,16 +71,21 @@ public class ArticleModerationController {
             if (approve) {
                 var edit = articleRepository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
-                articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
+                if (articleRepository.isFirstEdit(edit.getArticleId(), editId)) {
+                    articleRepository.updateVisibility(edit.getArticleId(), true);
+                } else {
+                    articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
 
-                var article = articleRepository.findById(edit.getArticleId()).orElseThrow(() -> new NotFoundResponse("Article not found."));
+                    var article = articleRepository.findById(edit.getArticleId()).orElseThrow(() -> new NotFoundResponse("Article not found."));
 
-                var newContent = differenceProcessor.applyDifferences(article.getContent(), edit.getDifferences());
-                var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
+                    var newContent = differenceProcessor.applyDifferences(article.getContent(), edit.getDifferences());
+                    var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
 
-                articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
-                articleRepository.updateEditDifferences(editId, newDifferences);
-                context.json(article);
+                    articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
+                    articleRepository.updateEditDifferences(editId, newDifferences);
+                }
+
+                context.json(edit);
             }
         } finally {
             editLocks.unlock(editId);
