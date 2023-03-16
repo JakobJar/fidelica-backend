@@ -1,4 +1,4 @@
-package org.fidelica.backend.post.twitter;
+package org.fidelica.backend.post.platform.twitter;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.fidelica.backend.post.Post;

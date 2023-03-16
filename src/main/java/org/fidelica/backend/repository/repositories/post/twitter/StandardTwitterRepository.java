@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.NonNull;
-import org.fidelica.backend.post.twitter.Tweet;
+import org.fidelica.backend.post.platform.twitter.Tweet;
 
 import java.util.Optional;
 

@@ -3,7 +3,7 @@ package org.fidelica.backend.post;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
-import org.fidelica.backend.post.twitter.TwitterPostURLProvider;
+import org.fidelica.backend.post.platform.twitter.TwitterPostURLProvider;
 import org.fidelica.backend.post.url.PostURLProvider;
 
 public class PostModule extends AbstractModule {

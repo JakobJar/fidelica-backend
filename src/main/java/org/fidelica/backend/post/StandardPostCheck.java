@@ -15,17 +15,17 @@ import java.util.LinkedHashSet;
 @BsonDiscriminator("StandardPostCheck")
 public class StandardPostCheck implements PostCheck {
 
-        private PostCheckRating rating;
-        private String comment;
-        private final Collection<ObjectId> relatedArticles;
+    private PostCheckRating rating;
+    private String note;
+    private final Collection<ObjectId> relatedArticles;
 
-        public StandardPostCheck(PostCheckRating rating, String comment) {
-            this(rating, comment, new LinkedHashSet<>());
-        }
+    public StandardPostCheck(PostCheckRating rating, String comment) {
+        this(rating, comment, new LinkedHashSet<>());
+    }
 
-        public StandardPostCheck(@NonNull PostCheckRating rating, String comment, @NonNull Collection<ObjectId> relatedArticles) {
-            this.rating = rating;
-            this.comment = comment;
-            this.relatedArticles = relatedArticles;
-        }
+    public StandardPostCheck(@NonNull PostCheckRating rating, String note, @NonNull Collection<ObjectId> relatedArticles) {
+        this.rating = rating;
+        this.note = note;
+        this.relatedArticles = relatedArticles;
+    }
 }

@@ -1,4 +1,4 @@
-package org.fidelica.backend.post.twitter;
+package org.fidelica.backend.post.platform.twitter;
 
 import com.google.inject.Inject;
 import lombok.NonNull;
