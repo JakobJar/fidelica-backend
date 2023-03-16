@@ -53,6 +53,12 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
+    public void updateVisibility(ObjectId id, boolean visible) {
+        articles.updateOne(eq("_id", id),
+                Updates.set("visible", visible));
+    }
+
+    @Override
     public boolean update(@NonNull ObjectId id, String title, String shortDescription, String content, ArticleRating rating) {
         List<Bson> changes = new ArrayList<>();
         if (title != null)
@@ -99,6 +105,11 @@ public class StandardArticleRepository implements ArticleRepository {
                 Updates.set("comment", comment));
         return edits.updateOne(and(eq("_id", id), eq("checkerId", null)), changes)
                 .wasAcknowledged();
+    }
+
+    @Override
+    public boolean isFirstEdit(ObjectId edit, ObjectId id) {
+        return false;
     }
 
     @Override

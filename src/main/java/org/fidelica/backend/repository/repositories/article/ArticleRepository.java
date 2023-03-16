@@ -17,6 +17,8 @@ public interface ArticleRepository {
 
     Optional<Article> findPreviewById(ObjectId id);
 
+    void updateVisibility(ObjectId id, boolean visible);
+
     boolean update(ObjectId id, String title, String shortDescription, String content, ArticleRating rating);
 
     void createEdit(ArticleEdit edit);
@@ -26,6 +28,8 @@ public interface ArticleRepository {
     boolean updateEditDifferences(ObjectId id, List<TextDifference> differences);
 
     boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment);
+
+    boolean isFirstEdit(ObjectId articleId, ObjectId id);
 
     void disproveOtherEdits(ObjectId articleId, ObjectId editId, ObjectId checkerId);
 
