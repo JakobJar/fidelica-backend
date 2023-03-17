@@ -105,7 +105,7 @@ public class ArticleEditController {
         if (newTitle == null && newClaim == null && newRating == null && contentChanges.isEmpty())
             throw new BadRequestResponse("No changes compared to current version.");
 
-        var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getTweetId());
+        var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
         repository.createEdit(edit);
 
         context.json(edit);

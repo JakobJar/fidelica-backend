@@ -35,25 +35,25 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public void create(Article article, ArticleEdit firstEdit) {
+    public void create(@NonNull Article article, @NonNull ArticleEdit firstEdit) {
         articles.insertOne(article);
         edits.insertOne(firstEdit);
     }
 
     @Override
-    public Optional<Article> findById(ObjectId id) {
+    public Optional<Article> findById(@NonNull ObjectId id) {
         return Optional.ofNullable(articles.find(eq("_id", id)).first());
     }
 
     @Override
-    public Optional<Article> findPreviewById(ObjectId id) {
+    public Optional<Article> findPreviewById(@NonNull ObjectId id) {
         return Optional.ofNullable(articles.find(eq("_id", id))
                 .projection(Projections.exclude("content"))
                 .first());
     }
 
     @Override
-    public void updateVisibility(ObjectId id, boolean visible) {
+    public void updateVisibility(@NonNull ObjectId id, boolean visible) {
         articles.updateOne(eq("_id", id),
                 Updates.set("visible", visible));
     }
@@ -74,17 +74,17 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public void createEdit(ArticleEdit edit) {
+    public void createEdit(@NonNull ArticleEdit edit) {
         edits.insertOne(edit);
     }
 
     @Override
-    public Optional<ArticleEdit> findEditById(ObjectId id) {
+    public Optional<ArticleEdit> findEditById(@NonNull ObjectId id) {
         return Optional.ofNullable(edits.find(eq("_id", id)).first());
     }
 
     @Override
-    public boolean updateEditDifferences(ObjectId id, List<TextDifference> differences) {
+    public boolean updateEditDifferences(@NonNull ObjectId id, @NonNull List<TextDifference> differences) {
         var changes = Updates.set("differences", differences);
         return edits.updateOne(eq("_id", id), changes).wasAcknowledged();
     }
@@ -99,7 +99,7 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public boolean checkEdit(ObjectId id, boolean approve, ObjectId checkerId, String comment) {
+    public boolean checkEdit(@NonNull ObjectId id, boolean approve, @NonNull ObjectId checkerId, @NonNull String comment) {
         var changes = Updates.combine(Updates.set("approve", approve),
                 Updates.set("checkerId", checkerId),
                 Updates.set("comment", comment));
@@ -108,15 +108,15 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public boolean isFirstEdit(ObjectId articleId, ObjectId id) {
+    public boolean isFirstEdit(@NonNull ObjectId articleId, @NonNull ObjectId id) {
         var result = edits.find(eq("articleId", articleId))
                 .projection(Projections.include("_id"))
                 .into(new ArrayList<>());
-        return result.size() == 1 && result.get(0).getTweetId().equals(id);
+        return result.size() == 1 && result.get(0).getId().equals(id);
     }
 
     @Override
-    public void disproveOtherEdits(ObjectId articleId, ObjectId editId, ObjectId checkerId) {
+    public void disproveOtherEdits(@NonNull ObjectId articleId, @NonNull ObjectId editId, @NonNull ObjectId checkerId) {
         var changes = Updates.combine(
                 Updates.set("approve", false),
                 Updates.set("checkerId", checkerId),
@@ -126,7 +126,7 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public List<ArticleEdit> getEditPreviews(ObjectId articleId, int limit, int offset) {
+    public List<ArticleEdit> getEditPreviews(@NonNull ObjectId articleId, int limit, int offset) {
         return edits.find(eq("articleId", articleId))
                 .projection(EDIT_PREVIEW_PROJECTION)
                 .skip(offset * limit)
@@ -135,7 +135,7 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public List<ArticleEdit> getEditDifferencesAfter(ObjectId articleId, ObjectId editId) {
+    public List<ArticleEdit> getEditDifferencesAfter(@NonNull ObjectId articleId, @NonNull ObjectId editId) {
         return edits.find((and(eq("articleId", articleId), gt("_id", editId))))
                 .sort(Sorts.descending("_id"))
                 .projection(Projections.include("differences"))

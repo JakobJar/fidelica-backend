@@ -27,12 +27,12 @@ public class StandardPostRepository implements PostRepository {
     }
 
     @Override
-    public void create(Post post) {
+    public void create(@NonNull Post post) {
         posts.insertOne(post);
     }
 
     @Override
-    public Optional<Post> getById(ObjectId id) {
+    public Optional<Post> getById(@NonNull ObjectId id) {
         return Optional.ofNullable(posts.find(eq("_id", id)).first());
     }
 
