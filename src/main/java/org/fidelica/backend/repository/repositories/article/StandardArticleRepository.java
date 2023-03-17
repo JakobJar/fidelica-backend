@@ -112,7 +112,7 @@ public class StandardArticleRepository implements ArticleRepository {
         var result = edits.find(eq("articleId", articleId))
                 .projection(Projections.include("_id"))
                 .into(new ArrayList<>());
-        return result.size() == 1 && result.get(0).getId().equals(id);
+        return result.size() == 1 && result.get(0).getTweetId().equals(id);
     }
 
     @Override

@@ -1,6 +1,10 @@
 package org.fidelica.backend.post;
 
-public interface Post {
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.fidelica.backend.repository.Identifiable;
+
+@BsonDiscriminator
+public interface Post extends Identifiable {
 
     PostCheck getCheck();
 }

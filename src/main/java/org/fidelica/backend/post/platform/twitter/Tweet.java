@@ -6,5 +6,5 @@ import org.fidelica.backend.post.Post;
 @BsonDiscriminator
 public interface Tweet extends Post {
 
-    long getId();
+    long getTweetId();
 }

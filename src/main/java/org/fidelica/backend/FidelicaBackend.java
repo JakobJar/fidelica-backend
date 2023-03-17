@@ -36,6 +36,7 @@ import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.routes.article.ArticleController;
 import org.fidelica.backend.rest.routes.article.ArticleEditController;
 import org.fidelica.backend.rest.routes.moderation.ArticleModerationController;
+import org.fidelica.backend.rest.routes.moderation.PostModerationController;
 import org.fidelica.backend.rest.routes.post.PostController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
@@ -99,10 +100,13 @@ public class FidelicaBackend extends AbstractModule {
     private void registerRoutes(Javalin app, Injector injector) {
         var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
         var userController = injector.getInstance(UserController.class);
-        var postController = injector.getInstance(PostController.class);
+
         var articleController = injector.getInstance(ArticleController.class);
         var articleEditController = injector.getInstance(ArticleEditController.class);
         var articleModerationController = injector.getInstance(ArticleModerationController.class);
+
+        var postController = injector.getInstance(PostController.class);
+        var postModerationController = injector.getInstance(PostModerationController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -139,6 +143,7 @@ public class FidelicaBackend extends AbstractModule {
 
             path("/moderation", () -> {
                 get("/edits", articleModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
+                get("/reports", postModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
             });
         });
     }

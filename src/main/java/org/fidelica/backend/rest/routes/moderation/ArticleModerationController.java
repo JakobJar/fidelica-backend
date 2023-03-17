@@ -64,7 +64,7 @@ public class ArticleModerationController {
 
         editLocks.lock(editId);
         try {
-            var success = articleRepository.checkEdit(editId, approve, user.getId(), comment);
+            var success = articleRepository.checkEdit(editId, approve, user.getTweetId(), comment);
             if (!success)
                 throw new ConflictResponse("Edit wasn't found or is already checked.");
 
@@ -74,14 +74,14 @@ public class ArticleModerationController {
                 if (articleRepository.isFirstEdit(edit.getArticleId(), editId)) {
                     articleRepository.updateVisibility(edit.getArticleId(), true);
                 } else {
-                    articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
+                    articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getTweetId());
 
                     var article = articleRepository.findById(edit.getArticleId()).orElseThrow(() -> new NotFoundResponse("Article not found."));
 
                     var newContent = differenceProcessor.applyDifferences(article.getContent(), edit.getDifferences());
                     var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
 
-                    articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
+                    articleRepository.update(article.getTweetId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
                     articleRepository.updateEditDifferences(editId, newDifferences);
                 }
 

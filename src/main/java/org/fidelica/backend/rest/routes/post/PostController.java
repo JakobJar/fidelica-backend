@@ -56,7 +56,8 @@ public class PostController {
         }
 
         var postProvider = getProvider(url);
-        var post = postProvider.createPost(url, new StandardPostCheck(rating, comment, relatedArticles));
+        var postCheck = new StandardPostCheck(ObjectId.get(), rating, comment, relatedArticles);
+        var post = postProvider.createPost(url, postCheck);
         context.json(post);
     }
 

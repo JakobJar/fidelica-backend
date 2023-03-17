@@ -4,8 +4,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import org.fidelica.backend.repository.repositories.article.ArticleRepository;
 import org.fidelica.backend.repository.repositories.article.StandardArticleRepository;
-import org.fidelica.backend.repository.repositories.post.twitter.StandardTwitterRepository;
-import org.fidelica.backend.repository.repositories.post.twitter.TwitterRepository;
+import org.fidelica.backend.repository.repositories.post.PostRepository;
+import org.fidelica.backend.repository.repositories.post.StandardPostRepository;
 import org.fidelica.backend.repository.repositories.user.GroupRepository;
 import org.fidelica.backend.repository.repositories.user.StandardGroupRepository;
 import org.fidelica.backend.repository.repositories.user.StandardUserRepository;
@@ -19,6 +19,6 @@ public class RepositoryModule extends AbstractModule {
         bind(GroupRepository.class).to(StandardGroupRepository.class).in(Scopes.SINGLETON);
         bind(ArticleRepository.class).to(StandardArticleRepository.class).in(Scopes.SINGLETON);
 
-        bind(TwitterRepository.class).to(StandardTwitterRepository.class).in(Scopes.SINGLETON);
+        bind(PostRepository.class).to(StandardPostRepository.class).in(Scopes.SINGLETON);
     }
 }

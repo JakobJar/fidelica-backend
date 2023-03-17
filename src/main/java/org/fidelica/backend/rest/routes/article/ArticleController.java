@@ -76,7 +76,7 @@ public class ArticleController {
         var article = new StandardArticle(ObjectId.get(), title, shortDescription, rating, content, Locale.forLanguageTag(language));
 
         var difference = textDifferenceProcessor.getDifference(content, "");
-        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getId(), "Create article.", title, shortDescription, rating, difference, user.getId());
+        var firstEdit = new StandardArticleEdit(ObjectId.get(), article.getTweetId(), "Create article.", title, shortDescription, rating, difference, user.getTweetId());
 
         repository.create(article, firstEdit);
         context.json(article);

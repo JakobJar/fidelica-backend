@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 public interface CheckEdit extends Identifiable {
 
+    ObjectId getPostId();
+
     String getNote();
 
     ArticleRating getRating();

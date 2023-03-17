@@ -18,6 +18,7 @@ public class StandardCheckEdit implements CheckEdit {
 
     @BsonId
     private final ObjectId id;
+    private final ObjectId postId;
     private String note;
     private ArticleRating rating;
     private final ObjectId editorId;
@@ -26,13 +27,14 @@ public class StandardCheckEdit implements CheckEdit {
     private ObjectId checkerId;
     private String comment;
 
-    public StandardCheckEdit(ObjectId id, String note, ArticleRating rating, ObjectId editorId) {
-        this(id, note, rating, editorId, false, null, null);
+    public StandardCheckEdit(ObjectId id, ObjectId postId, String note, ArticleRating rating, ObjectId editorId) {
+        this(id, postId, note, rating, editorId, false, null, null);
     }
 
-    public StandardCheckEdit(@NonNull ObjectId id, String note, ArticleRating rating,
+    public StandardCheckEdit(@NonNull ObjectId id, @NonNull ObjectId postId, String note, ArticleRating rating,
                              @NonNull ObjectId editorId, boolean approved, ObjectId checkerId, String comment) {
         this.id = id;
+        this.postId = postId;
         this.note = note;
         this.rating = rating;
         this.editorId = editorId;

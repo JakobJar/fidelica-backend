@@ -31,12 +31,12 @@ public class StandardGroupManager implements GroupManager {
 
     @Override
     public void register(Group group) {
-        groups.put(group.getId(), group);
+        groups.put(group.getTweetId(), group);
     }
 
     @Override
     public void unregister(Group group) {
-        groups.remove(group.getId());
+        groups.remove(group.getTweetId());
     }
 
     @Override

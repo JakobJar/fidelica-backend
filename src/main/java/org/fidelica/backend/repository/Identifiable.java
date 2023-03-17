@@ -4,5 +4,5 @@ import org.bson.types.ObjectId;
 
 public interface Identifiable {
 
-    ObjectId getId();
+    ObjectId getTweetId();
 }
