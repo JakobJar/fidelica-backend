@@ -25,7 +25,7 @@ public class TwitterPostURLProvider implements PostURLProvider<Tweet> {
     @Override
     public Optional<Tweet> getPostByURL(@NonNull String url) {
         var id = getId(url);
-        return repository.getTweetById(id);
+        return repository.findTweetById(id);
     }
 
     @Override

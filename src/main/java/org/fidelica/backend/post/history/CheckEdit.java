@@ -1,10 +1,11 @@
 package org.fidelica.backend.post.history;
 
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.ArticleRating;
+import org.fidelica.backend.post.PostCheckRating;
 import org.fidelica.backend.repository.Identifiable;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 public interface CheckEdit extends Identifiable {
 
@@ -12,7 +13,9 @@ public interface CheckEdit extends Identifiable {
 
     String getNote();
 
-    ArticleRating getRating();
+    PostCheckRating getRating();
+
+    Collection<ObjectId> getRelatedArticles();
 
     ObjectId getEditorId();
 

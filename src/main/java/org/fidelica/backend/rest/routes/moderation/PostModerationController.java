@@ -1,9 +1,7 @@
 package org.fidelica.backend.rest.routes.moderation;
 
 import com.google.inject.Inject;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.Context;
-import io.javalin.http.UnauthorizedResponse;
+import io.javalin.http.*;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.repository.repositories.post.PostRepository;
@@ -40,5 +38,42 @@ public class PostModerationController {
 
         var pendingEdits = postRepository.getUncheckedPostEdits();
         context.json(pendingEdits);
+    }
+
+    public void checkEdit(@NonNull Context context) {
+        ObjectId editId;
+        try {
+            editId = new ObjectId(context.pathParam("editId"));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse(e.getMessage());
+        }
+
+        boolean approve = context.formParamAsClass("approve", Boolean.class)
+                .getOrThrow(unused -> new BadRequestResponse("Invalid form data."));
+        var comment = context.formParam("comment");
+        if (comment == null)
+            throw new BadRequestResponse("Invalid form data.");
+
+        User user = context.sessionAttribute("user");
+        if (!permissionProcessor.hasPermission(user, "post.edit.check"))
+            throw new UnauthorizedResponse("You're not permitted to approve edits.");
+
+        editLocks.lock(editId);
+        try {
+            var success = postRepository.checkEdit(editId, approve, user.getId(), comment);
+            if (!success)
+                throw new ConflictResponse("Edit wasn't found or is already checked.");
+
+            var edit = postRepository.findCheckEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
+
+            if (approve) {
+                postRepository.update(edit.getPostId(), edit.getNote(), edit.getRating(), edit.getRelatedArticles());
+                // TODO: Disprove other edits
+            }
+
+            context.json(edit);
+        } finally {
+            editLocks.unlock(editId);
+        }
     }
 }

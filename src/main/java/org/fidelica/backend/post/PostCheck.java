@@ -8,7 +8,6 @@ import java.util.Collection;
 @BsonDiscriminator
 public interface PostCheck {
 
-
     PostCheckRating getRating();
 
     String getNote();

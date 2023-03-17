@@ -5,10 +5,11 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.ArticleRating;
+import org.fidelica.backend.post.PostCheckRating;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -20,23 +21,26 @@ public class StandardCheckEdit implements CheckEdit {
     private final ObjectId id;
     private final ObjectId postId;
     private String note;
-    private ArticleRating rating;
+    private PostCheckRating rating;
+    private final Collection<ObjectId> relatedArticles;
     private final ObjectId editorId;
 
     private boolean approved;
     private ObjectId checkerId;
     private String comment;
 
-    public StandardCheckEdit(ObjectId id, ObjectId postId, String note, ArticleRating rating, ObjectId editorId) {
-        this(id, postId, note, rating, editorId, false, null, null);
+    public StandardCheckEdit(ObjectId id, ObjectId postId, String note, PostCheckRating rating, Collection<ObjectId> relatedArticles, ObjectId editorId) {
+        this(id, postId, note, rating, relatedArticles, editorId, false, null, null);
     }
 
-    public StandardCheckEdit(@NonNull ObjectId id, @NonNull ObjectId postId, String note, ArticleRating rating,
-                             @NonNull ObjectId editorId, boolean approved, ObjectId checkerId, String comment) {
+    public StandardCheckEdit(@NonNull ObjectId id, @NonNull ObjectId postId, String note, PostCheckRating rating,
+                             @NonNull Collection<ObjectId> relatedArticles, @NonNull ObjectId editorId,
+                             boolean approved, ObjectId checkerId, String comment) {
         this.id = id;
         this.postId = postId;
         this.note = note;
         this.rating = rating;
+        this.relatedArticles = relatedArticles;
         this.editorId = editorId;
         this.approved = approved;
         this.checkerId = checkerId;
