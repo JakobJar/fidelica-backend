@@ -116,25 +116,28 @@ public class FidelicaBackend extends AbstractModule {
             });
 
             path("/user", () -> {
-                get("/", userController::getCurrentUser, AccessRole.AUTHENTICATED);
+                get(userController::getCurrentUser, AccessRole.AUTHENTICATED);
                 get("/{id}", userController::getUserById);
             });
 
-            post("/report", postController::reportPost, AccessRole.AUTHENTICATED);
+            path("/report", () -> {
+                post(postController::reportPost, AccessRole.AUTHENTICATED);
+
+            });
 
             path("/check", () -> {
                 get("/<url>", postController::getByURL);
             });
 
             path("/article", () -> {
-                post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
+                post(articleController::createArticle, AccessRole.AUTHENTICATED);
                 path("/{articleId}", () -> {
-                    get("/", articleController::getArticleById);
+                    get(articleController::getArticleById);
                     get("/edits", articleEditController::getEditPreviews);
                     path("/edit", () -> {
-                        post("/", articleEditController::createEdit, AccessRole.AUTHENTICATED);
+                        post(articleEditController::createEdit, AccessRole.AUTHENTICATED);
                         path("/{editId}", () -> {
-                            get("/", articleEditController::getEditById);
+                            get(articleEditController::getEditById);
                             post("/check", articleModerationController::checkEdit, AccessRole.AUTHENTICATED);
                         });
                     });
