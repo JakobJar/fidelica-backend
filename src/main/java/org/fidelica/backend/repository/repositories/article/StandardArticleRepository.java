@@ -24,6 +24,8 @@ import static com.mongodb.client.model.Filters.text;
 
 public class StandardArticleRepository implements ArticleRepository {
 
+    private static final Bson PREVIEW_PROJECTION = Projections.exclude("content");
+
     private final MongoCollection<Article> articles;
     private final MongoCollection<ArticleEdit> edits;
 
@@ -47,7 +49,7 @@ public class StandardArticleRepository implements ArticleRepository {
     @Override
     public Optional<Article> findPreviewById(@NonNull ObjectId id) {
         return Optional.ofNullable(articles.find(eq("_id", id))
-                .projection(Projections.exclude("content"))
+                .projection(PREVIEW_PROJECTION)
                 .first());
     }
 
@@ -57,8 +59,9 @@ public class StandardArticleRepository implements ArticleRepository {
                 .caseSensitive(false)
                 .language(locale.getLanguage());
         return articles.find(text(query, searchOptions))
-                .projection(Projections.exclude("content"))
+                .projection(PREVIEW_PROJECTION)
                 .sort(Sorts.metaTextScore("score"))
+                .limit(5)
                 .into(new ArrayList<>());
     }
 
