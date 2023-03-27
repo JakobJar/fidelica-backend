@@ -5,6 +5,7 @@ import io.javalin.http.*;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.history.difference.TextDifferenceProcessor;
+import org.fidelica.backend.repository.repositories.article.ArticleEditRepository;
 import org.fidelica.backend.repository.repositories.article.ArticleRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
@@ -13,6 +14,7 @@ import org.fidelica.backend.util.LockMap;
 public class ArticleModerationController {
 
     private final ArticleRepository articleRepository;
+    private final ArticleEditRepository editRepository;
     private final TextDifferenceProcessor differenceProcessor;
     private final UserPermissionProcessor permissionProcessor;
 
@@ -20,9 +22,11 @@ public class ArticleModerationController {
 
     @Inject
     public ArticleModerationController(@NonNull ArticleRepository articleRepository,
+                                       @NonNull ArticleEditRepository editRepository,
                                        @NonNull TextDifferenceProcessor differenceProcessor,
                                        @NonNull UserPermissionProcessor permissionProcessor) {
         this.articleRepository = articleRepository;
+        this.editRepository = editRepository;
         this.differenceProcessor = differenceProcessor;
         this.permissionProcessor = permissionProcessor;
 
@@ -40,7 +44,7 @@ public class ArticleModerationController {
         if (!permissionProcessor.hasPermission(user, "article.moderate"))
             throw new UnauthorizedResponse("You are not permitted to moderate articles.");
 
-        var pendingEdits = articleRepository.getUncheckedEditPreviews(page, limit);
+        var pendingEdits = editRepository.getUncheckedPreviews(page, limit);
         context.json(pendingEdits);
     }
 
@@ -64,17 +68,17 @@ public class ArticleModerationController {
 
         editLocks.lock(editId);
         try {
-            var success = articleRepository.checkEdit(editId, approve, user.getId(), comment);
+            var success = editRepository.check(editId, approve, user.getId(), comment);
             if (!success)
                 throw new ConflictResponse("Edit wasn't found or is already checked.");
 
             if (approve) {
-                var edit = articleRepository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
+                var edit = editRepository.findById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
-                if (articleRepository.isFirstEdit(edit.getArticleId(), editId)) {
+                if (editRepository.isFirst(edit.getArticleId(), editId)) {
                     articleRepository.updateVisibility(edit.getArticleId(), true);
                 } else {
-                    articleRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
+                    editRepository.disproveOtherEdits(edit.getArticleId(), editId, user.getId());
 
                     var article = articleRepository.findById(edit.getArticleId()).orElseThrow(() -> new NotFoundResponse("Article not found."));
 
@@ -82,7 +86,7 @@ public class ArticleModerationController {
                     var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
 
                     articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
-                    articleRepository.updateEditDifferences(editId, newDifferences);
+                    editRepository.updateDifferences(editId, newDifferences);
                 }
 
                 context.json(edit);

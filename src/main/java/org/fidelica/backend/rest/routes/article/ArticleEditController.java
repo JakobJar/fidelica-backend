@@ -12,6 +12,7 @@ import org.fidelica.backend.article.history.ArticleEdit;
 import org.fidelica.backend.article.history.ComputedArticleEdit;
 import org.fidelica.backend.article.history.StandardArticleEdit;
 import org.fidelica.backend.article.history.difference.TextDifferenceProcessor;
+import org.fidelica.backend.repository.repositories.article.ArticleEditRepository;
 import org.fidelica.backend.repository.repositories.article.ArticleRepository;
 import org.fidelica.backend.user.User;
 import org.fidelica.backend.user.permission.UserPermissionProcessor;
@@ -21,17 +22,20 @@ import java.util.regex.Pattern;
 
 public class ArticleEditController {
 
-    private final ArticleRepository repository;
+    private final ArticleRepository articleRepository;
+    private final ArticleEditRepository editRepository;
     private final TextDifferenceProcessor textDifferenceProcessor;
     private final UserPermissionProcessor permissionProcessor;
 
     private final Pattern textPattern;
 
     @Inject
-    public ArticleEditController(@NonNull ArticleRepository repository,
+    public ArticleEditController(@NonNull ArticleRepository articleRepository,
+                                 @NonNull ArticleEditRepository editRepository,
                                  @NonNull TextDifferenceProcessor textDifferenceProcessor,
                                  @NonNull UserPermissionProcessor permissionProcessor) {
-        this.repository = repository;
+        this.articleRepository = articleRepository;
+        this.editRepository = editRepository;
         this.textDifferenceProcessor = textDifferenceProcessor;
         this.permissionProcessor = permissionProcessor;
 
@@ -81,7 +85,7 @@ public class ArticleEditController {
         if (!permissionProcessor.hasPermission(user, "article.edit"))
             throw new UnauthorizedResponse("You do not have permission to edit fact checks.");
 
-        var article = repository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
+        var article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
 
         if ((!article.isVisible() || !article.isEditable())
                 && !permissionProcessor.hasPermission(user, "article.ignoreditable"))
@@ -106,7 +110,7 @@ public class ArticleEditController {
             throw new BadRequestResponse("No changes compared to current version.");
 
         var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
-        repository.createEdit(edit);
+        editRepository.create(edit);
 
         context.json(edit);
     }
@@ -126,7 +130,7 @@ public class ArticleEditController {
             throw new BadRequestResponse("Invalid page or limit.");
 
         // TODO: Check permission.
-        var articlePreviews = repository.getEditPreviews(articleId, page, limit);
+        var articlePreviews = editRepository.getPreviews(articleId, page, limit);
         context.json(articlePreviews);
     }
 
@@ -140,10 +144,10 @@ public class ArticleEditController {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        var article = repository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
-        var edit = repository.findEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
+        var article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
+        var edit = editRepository.findById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
-        var editsAfter = repository.getEditDifferencesAfter(articleId, editId);
+        var editsAfter = editRepository.getDifferencesAfter(articleId, editId);
 
         var newContent = article.getContent();
         for (ArticleEdit editAfter : editsAfter) {
