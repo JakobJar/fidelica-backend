@@ -7,6 +7,7 @@ import org.fidelica.backend.article.history.ArticleEdit;
 import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface ArticleRepository {
@@ -16,6 +17,8 @@ public interface ArticleRepository {
     Optional<Article> findById(ObjectId id);
 
     Optional<Article> findPreviewById(ObjectId id);
+
+    List<Article> search(String query, Locale locale);
 
     void updateVisibility(ObjectId id, boolean visible);
 

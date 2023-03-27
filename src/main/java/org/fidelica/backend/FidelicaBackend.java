@@ -128,6 +128,7 @@ public class FidelicaBackend extends AbstractModule {
 
             path("/article", () -> {
                 post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
+                get("/search", articleController::searchArticles);
                 path("/{articleId}", () -> {
                     get("/", articleController::getArticleById);
                     get("/edits", articleEditController::getEditPreviews);

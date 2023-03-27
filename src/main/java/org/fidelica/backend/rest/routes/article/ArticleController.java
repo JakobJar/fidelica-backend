@@ -82,6 +82,17 @@ public class ArticleController {
         context.json(article);
     }
 
+    public void searchArticles(@NonNull Context context) {
+        var query = context.queryParamAsClass("query", String.class)
+                .getOrThrow(unused -> new BadRequestResponse("Query required"));
+        var language = context.queryParamAsClass("language", String.class).getOrDefault("en-us");
+
+        var locale = Locale.forLanguageTag(language);
+        var articles = repository.search(query, locale);
+
+        context.json(articles);
+    }
+
     public void getArticleById(@NonNull Context context) {
         var preview = context.queryParamAsClass("preview", Boolean.class).getOrDefault(false);
 

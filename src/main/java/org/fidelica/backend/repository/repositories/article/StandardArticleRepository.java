@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.TextSearchOptions;
 import com.mongodb.client.model.Updates;
 import lombok.NonNull;
 import org.bson.conversions.Bson;
@@ -16,6 +17,7 @@ import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
@@ -50,6 +52,17 @@ public class StandardArticleRepository implements ArticleRepository {
         return Optional.ofNullable(articles.find(eq("_id", id))
                 .projection(Projections.exclude("content"))
                 .first());
+    }
+
+    @Override
+    public List<Article> search(@NonNull String query, @NonNull Locale locale) {
+        var searchOptions = new TextSearchOptions()
+                .caseSensitive(false)
+                .language(locale.getLanguage());
+        return articles.find(text(query, searchOptions))
+                .projection(Projections.exclude("content"))
+                .sort(Sorts.metaTextScore("score"))
+                .into(new ArrayList<>());
     }
 
     @Override

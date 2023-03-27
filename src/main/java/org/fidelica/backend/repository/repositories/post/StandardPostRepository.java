@@ -56,7 +56,7 @@ public class StandardPostRepository implements PostRepository {
 
     @Override
     public Optional<Tweet> findTweetById(long id) {
-        return Optional.of((Tweet) posts.find(eq("tweetId", id)).first());
+        return Optional.ofNullable((Tweet) posts.find(eq("tweetId", id)).first());
     }
 
     @Override
