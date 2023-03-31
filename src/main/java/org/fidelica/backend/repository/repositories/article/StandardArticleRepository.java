@@ -57,7 +57,8 @@ public class StandardArticleRepository implements ArticleRepository {
     public List<Article> search(@NonNull String query, @NonNull Locale locale) {
         var searchOptions = new TextSearchOptions()
                 .caseSensitive(false)
-                .language(locale.getLanguage());
+                .language(locale.getLanguage())
+                .diacriticSensitive(false);
         return articles.find(text(query, searchOptions))
                 .projection(PREVIEW_PROJECTION)
                 .sort(Sorts.metaTextScore("score"))
