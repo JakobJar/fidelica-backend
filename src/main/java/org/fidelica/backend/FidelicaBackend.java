@@ -112,7 +112,7 @@ public class FidelicaBackend extends AbstractModule {
             path("/auth", () -> {
                 post("/register", userAuthenticationController::register, AccessRole.ANONYMOUS);
                 post("/login", userAuthenticationController::login, AccessRole.ANONYMOUS);
-                get("/logout", userAuthenticationController::logout, AccessRole.AUTHENTICATED);
+                post("/logout", userAuthenticationController::logout, AccessRole.AUTHENTICATED);
             });
 
             path("/user", () -> {
