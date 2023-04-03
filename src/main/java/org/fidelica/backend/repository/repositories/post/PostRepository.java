@@ -16,6 +16,8 @@ public interface PostRepository {
 
     boolean update(ObjectId id, String note, PostCheckRating rating, Collection<ObjectId> relatedArticles);
 
+    boolean updateVisibility(ObjectId id, boolean visible);
+
     Optional<Post> findById(ObjectId id);
 
     Optional<Tweet> findTweetById(long id);

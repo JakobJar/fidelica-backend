@@ -67,8 +67,11 @@ public class PostModerationController {
             var edit = postRepository.findCheckEditById(editId).orElseThrow(() -> new NotFoundResponse("Edit not found."));
 
             if (approve) {
-                postRepository.update(edit.getPostId(), edit.getNote(), edit.getRating(), edit.getRelatedArticles());
-                // TODO: Disprove other edits
+                if (postRepository.isFirstEdit(edit.getPostId(), editId)) {
+                    postRepository.updateVisibility(edit.getPostId(), true);
+                } else {
+                    postRepository.update(edit.getPostId(), edit.getNote(), edit.getRating(), edit.getRelatedArticles());
+                }
             }
 
             context.json(edit);

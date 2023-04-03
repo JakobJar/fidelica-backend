@@ -50,6 +50,11 @@ public class StandardPostRepository implements PostRepository {
     }
 
     @Override
+    public boolean updateVisibility(ObjectId id, boolean visible) {
+        return posts.updateOne(eq("_id", id), Updates.set("check.visible", visible)).wasAcknowledged();
+    }
+
+    @Override
     public Optional<Post> findById(@NonNull ObjectId id) {
         return Optional.ofNullable(posts.find(eq("_id", id)).first());
     }

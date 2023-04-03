@@ -29,7 +29,11 @@ public class PostController {
 
         var postProvider = getProvider(url);
 
-        context.json(postProvider.getPostByURL(url).orElseThrow(() -> new NotFoundResponse("Post not found.")));
+        var post = postProvider.getPostByURL(url).orElseThrow(() -> new NotFoundResponse("Post not found."));
+        if (!post.getCheck().isVisible())
+            throw new NotFoundResponse("Post not found.");
+
+        context.json(post);
     }
 
     // Only for testing
