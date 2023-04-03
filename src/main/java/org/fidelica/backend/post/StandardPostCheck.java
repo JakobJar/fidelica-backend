@@ -19,13 +19,19 @@ public class StandardPostCheck implements PostCheck {
     private String note;
     private final Collection<ObjectId> relatedArticles;
 
+    private boolean visible;
+    private boolean editable;
+
     public StandardPostCheck(PostCheckRating rating, String comment) {
-        this(rating, comment, new LinkedHashSet<>());
+        this(rating, comment, new LinkedHashSet<>(), false, true);
     }
 
-    public StandardPostCheck(@NonNull PostCheckRating rating, String note, @NonNull Collection<ObjectId> relatedArticles) {
+    public StandardPostCheck(@NonNull PostCheckRating rating, String note, @NonNull Collection<ObjectId> relatedArticles,
+                             boolean visible, boolean editable) {
         this.rating = rating;
         this.note = note;
         this.relatedArticles = relatedArticles;
+        this.visible = visible;
+        this.editable = editable;
     }
 }

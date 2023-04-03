@@ -13,4 +13,8 @@ public interface PostCheck {
     String getNote();
 
     Collection<ObjectId> getRelatedArticles();
+
+    boolean isVisible();
+
+    boolean isEditable();
 }

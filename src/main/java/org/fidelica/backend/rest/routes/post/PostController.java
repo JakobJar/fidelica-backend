@@ -56,15 +56,15 @@ public class PostController {
         }
 
         var postProvider = getProvider(url);
-        var postCheck = new StandardPostCheck(rating, comment, relatedArticles);
+        var postCheck = new StandardPostCheck(rating, comment, relatedArticles, false, true);
         var post = postProvider.createPost(url, postCheck);
         context.json(post);
     }
 
-        private PostURLProvider<?> getProvider(@NonNull String url) {
-            return postURLProvider.stream()
-                    .filter(provider -> provider.matches(url))
-                    .findFirst()
-                    .orElseThrow(() -> new BadRequestResponse("Post url is not supported or invalid."));
+    private PostURLProvider<?> getProvider(@NonNull String url) {
+        return postURLProvider.stream()
+                .filter(provider -> provider.matches(url))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestResponse("Post url is not supported or invalid."));
     }
 }
