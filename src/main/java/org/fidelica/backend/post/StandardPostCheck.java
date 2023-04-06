@@ -15,23 +15,29 @@ import java.util.LinkedHashSet;
 @BsonDiscriminator("StandardPostCheck")
 public class StandardPostCheck implements PostCheck {
 
-    private PostCheckRating rating;
-    private String note;
+    private final ObjectId id;
+    private final ObjectId postId;
+
+    private final PostCheckRating rating;
+    private final String note;
     private final Collection<ObjectId> relatedArticles;
 
-    private boolean visible;
-    private boolean editable;
+    private final Collection<ObjectId> upvoters;
+    private final Collection<ObjectId> downvoters;
 
-    public StandardPostCheck(PostCheckRating rating, String comment) {
-        this(rating, comment, new LinkedHashSet<>(), false, true);
+    public StandardPostCheck(ObjectId id, ObjectId postId, PostCheckRating rating, String comment, Collection<ObjectId> relatedArticles) {
+        this(id, postId, rating, comment, relatedArticles, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
-    public StandardPostCheck(@NonNull PostCheckRating rating, String note, @NonNull Collection<ObjectId> relatedArticles,
-                             boolean visible, boolean editable) {
+    public StandardPostCheck(@NonNull ObjectId id, @NonNull ObjectId postId, @NonNull PostCheckRating rating,
+                             String note, @NonNull Collection<ObjectId> relatedArticles,
+                             @NonNull Collection<ObjectId> upvoters, @NonNull Collection<ObjectId> downvoters) {
+        this.id = id;
+        this.postId = postId;
         this.rating = rating;
         this.note = note;
         this.relatedArticles = relatedArticles;
-        this.visible = visible;
-        this.editable = editable;
+        this.upvoters = upvoters;
+        this.downvoters = downvoters;
     }
 }

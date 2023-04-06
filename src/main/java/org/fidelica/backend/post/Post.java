@@ -6,5 +6,4 @@ import org.fidelica.backend.repository.Identifiable;
 @BsonDiscriminator
 public interface Post extends Identifiable {
 
-    PostCheck getCheck();
 }

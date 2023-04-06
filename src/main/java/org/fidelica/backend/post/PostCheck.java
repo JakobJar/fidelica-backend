@@ -14,7 +14,7 @@ public interface PostCheck {
 
     Collection<ObjectId> getRelatedArticles();
 
-    boolean isVisible();
+    Collection<ObjectId> getUpvoters();
 
-    boolean isEditable();
+    Collection<ObjectId> getDownvoters();
 }

@@ -4,7 +4,6 @@ import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.post.PostCheck;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -16,11 +15,9 @@ public class StandardTweet implements Tweet {
     private final ObjectId id;
 
     private final long tweetId;
-    private PostCheck check;
 
-    public StandardTweet(ObjectId id, long tweetId, @NonNull PostCheck check) {
+    public StandardTweet(@NonNull ObjectId id, long tweetId) {
         this.id = id;
         this.tweetId = tweetId;
-        this.check = check;
     }
 }

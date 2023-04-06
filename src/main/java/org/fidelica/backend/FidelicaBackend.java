@@ -36,8 +36,7 @@ import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.routes.article.ArticleController;
 import org.fidelica.backend.rest.routes.article.ArticleEditController;
 import org.fidelica.backend.rest.routes.moderation.ArticleModerationController;
-import org.fidelica.backend.rest.routes.moderation.PostModerationController;
-import org.fidelica.backend.rest.routes.post.PostController;
+import org.fidelica.backend.rest.routes.post.PostCheckController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
 import org.fidelica.backend.user.UserModule;
@@ -105,8 +104,7 @@ public class FidelicaBackend extends AbstractModule {
         var articleEditController = injector.getInstance(ArticleEditController.class);
         var articleModerationController = injector.getInstance(ArticleModerationController.class);
 
-        var postController = injector.getInstance(PostController.class);
-        var postModerationController = injector.getInstance(PostModerationController.class);
+        var postController = injector.getInstance(PostCheckController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -120,13 +118,15 @@ public class FidelicaBackend extends AbstractModule {
                 get("/{id}", userController::getUserById);
             });
 
-            path("/report", () -> {
-                post(postController::reportPost, AccessRole.AUTHENTICATED);
-
-            });
+            post("/report", postController::reportPost, AccessRole.AUTHENTICATED);
 
             path("/check", () -> {
-                get("/<url>", postController::getByURL);
+                get("/url/<url>", postController::getByURL);
+                path("/id/{postId}", () -> {
+                    get(postController::getById);
+                    post("/upvote", postController::upvoteCheck, AccessRole.AUTHENTICATED);
+                    post("/downvote", postController::downvoteCheck, AccessRole.AUTHENTICATED);
+                });
             });
 
             path("/article", () -> {
@@ -147,7 +147,6 @@ public class FidelicaBackend extends AbstractModule {
 
             path("/moderation", () -> {
                 get("/edits", articleModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
-                get("/reports", postModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
             });
         });
     }

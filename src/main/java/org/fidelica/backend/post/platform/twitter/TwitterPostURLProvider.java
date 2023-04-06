@@ -3,7 +3,6 @@ package org.fidelica.backend.post.platform.twitter;
 import com.google.inject.Inject;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.post.PostCheck;
 import org.fidelica.backend.post.url.PostURLProvider;
 import org.fidelica.backend.repository.repositories.post.PostRepository;
 
@@ -29,10 +28,10 @@ public class TwitterPostURLProvider implements PostURLProvider<Tweet> {
     }
 
     @Override
-    public Tweet createPost(@NonNull String url, PostCheck check) {
+    public Tweet createPost(@NonNull String url) {
         var id = getId(url);
 
-        var tweet = new StandardTweet(ObjectId.get(), id, check);
+        var tweet = new StandardTweet(ObjectId.get(), id);
         repository.create(tweet);
 
         return tweet;
