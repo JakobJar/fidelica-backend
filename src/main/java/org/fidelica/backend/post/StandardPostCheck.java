@@ -21,22 +21,24 @@ public class StandardPostCheck implements PostCheck {
     private final PostCheckRating rating;
     private final String note;
     private final Collection<ObjectId> relatedArticles;
+    private final ObjectId reporterId;
 
     private final Collection<ObjectId> upvoters;
     private final Collection<ObjectId> downvoters;
 
-    public StandardPostCheck(ObjectId id, ObjectId postId, PostCheckRating rating, String comment, Collection<ObjectId> relatedArticles) {
-        this(id, postId, rating, comment, relatedArticles, new LinkedHashSet<>(), new LinkedHashSet<>());
+    public StandardPostCheck(ObjectId id, ObjectId postId, PostCheckRating rating, String comment, Collection<ObjectId> relatedArticles, ObjectId reporterId) {
+        this(id, postId, rating, comment, relatedArticles, reporterId, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
     public StandardPostCheck(@NonNull ObjectId id, @NonNull ObjectId postId, @NonNull PostCheckRating rating,
-                             String note, @NonNull Collection<ObjectId> relatedArticles,
+                             String note, @NonNull Collection<ObjectId> relatedArticles, @NonNull ObjectId reporterId,
                              @NonNull Collection<ObjectId> upvoters, @NonNull Collection<ObjectId> downvoters) {
         this.id = id;
         this.postId = postId;
         this.rating = rating;
         this.note = note;
         this.relatedArticles = relatedArticles;
+        this.reporterId = reporterId;
         this.upvoters = upvoters;
         this.downvoters = downvoters;
     }

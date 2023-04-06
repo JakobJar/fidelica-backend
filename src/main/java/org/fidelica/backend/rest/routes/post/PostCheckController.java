@@ -82,12 +82,16 @@ public class PostCheckController {
             throw new BadRequestResponse("Contains invalid related fact check id: " + e.getMessage());
         }
 
+        User user = context.sessionAttribute("user");
+        if (!permissionProcessor.hasPermission(user, "postCheck.create"))
+            throw new UnauthorizedResponse("You don't have permission to create a check.");
+
         var postProvider = getProvider(url);
         Post post = postProvider.getPostByURL(url).orElse(null);
         if (post == null)
             post = postProvider.createPost(url);
 
-        var postCheck = new StandardPostCheck(ObjectId.get(), post.getId(), rating, comment, relatedArticles);
+        var postCheck = new StandardPostCheck(ObjectId.get(), post.getId(), rating, comment, relatedArticles, user.getId());
         postRepository.createCheck(postCheck);
         context.json(postCheck);
     }
