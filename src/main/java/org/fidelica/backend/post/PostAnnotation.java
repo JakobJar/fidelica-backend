@@ -6,9 +6,9 @@ import org.bson.types.ObjectId;
 import java.util.Collection;
 
 @BsonDiscriminator
-public interface PostCheck {
+public interface PostAnnotation {
 
-    PostCheckRating getRating();
+    PostRating getRating();
 
     String getNote();
 

@@ -13,12 +13,12 @@ import java.util.LinkedHashSet;
 @Data
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @BsonDiscriminator("StandardPostCheck")
-public class StandardPostCheck implements PostCheck {
+public class StandardPostAnnotation implements PostAnnotation {
 
     private final ObjectId id;
     private final ObjectId postId;
 
-    private final PostCheckRating rating;
+    private final PostRating rating;
     private final String note;
     private final Collection<ObjectId> relatedArticles;
     private final ObjectId reporterId;
@@ -26,13 +26,13 @@ public class StandardPostCheck implements PostCheck {
     private final Collection<ObjectId> upvoters;
     private final Collection<ObjectId> downvoters;
 
-    public StandardPostCheck(ObjectId id, ObjectId postId, PostCheckRating rating, String comment, Collection<ObjectId> relatedArticles, ObjectId reporterId) {
+    public StandardPostAnnotation(ObjectId id, ObjectId postId, PostRating rating, String comment, Collection<ObjectId> relatedArticles, ObjectId reporterId) {
         this(id, postId, rating, comment, relatedArticles, reporterId, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
-    public StandardPostCheck(@NonNull ObjectId id, @NonNull ObjectId postId, @NonNull PostCheckRating rating,
-                             String note, @NonNull Collection<ObjectId> relatedArticles, @NonNull ObjectId reporterId,
-                             @NonNull Collection<ObjectId> upvoters, @NonNull Collection<ObjectId> downvoters) {
+    public StandardPostAnnotation(@NonNull ObjectId id, @NonNull ObjectId postId, @NonNull PostRating rating,
+                                  String note, @NonNull Collection<ObjectId> relatedArticles, @NonNull ObjectId reporterId,
+                                  @NonNull Collection<ObjectId> upvoters, @NonNull Collection<ObjectId> downvoters) {
         this.id = id;
         this.postId = postId;
         this.rating = rating;

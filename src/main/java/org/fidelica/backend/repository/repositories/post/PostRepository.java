@@ -2,7 +2,7 @@ package org.fidelica.backend.repository.repositories.post;
 
 import org.bson.types.ObjectId;
 import org.fidelica.backend.post.Post;
-import org.fidelica.backend.post.PostCheck;
+import org.fidelica.backend.post.PostAnnotation;
 import org.fidelica.backend.post.platform.twitter.Tweet;
 
 import java.util.List;
@@ -12,15 +12,15 @@ public interface PostRepository {
 
     void create(Post post);
 
-    void createCheck(PostCheck check);
+    void createAnnotation(PostAnnotation check);
 
     Optional<Post> findById(ObjectId id);
 
     Optional<Tweet> findTweetById(long id);
 
-    List<PostCheck> findChecksById(ObjectId id);
+    List<PostAnnotation> findAnnotationsById(ObjectId id);
 
-    boolean upvoteCheck(ObjectId id, ObjectId userId);
+    boolean upvoteAnnotation(ObjectId id, ObjectId userId);
 
-    boolean downvoteCheck(ObjectId id, ObjectId userId);
+    boolean downvoteAnnotation(ObjectId id, ObjectId userId);
 }

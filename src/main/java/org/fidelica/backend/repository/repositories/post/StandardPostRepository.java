@@ -7,7 +7,7 @@ import com.mongodb.client.model.Updates;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.post.Post;
-import org.fidelica.backend.post.PostCheck;
+import org.fidelica.backend.post.PostAnnotation;
 import org.fidelica.backend.post.platform.twitter.Tweet;
 
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ import static com.mongodb.client.model.Filters.eq;
 public class StandardPostRepository implements PostRepository {
 
     private final MongoCollection<Post> posts;
-    private final MongoCollection<PostCheck> checks;
+    private final MongoCollection<PostAnnotation> checks;
 
     @Inject
     public StandardPostRepository(@NonNull MongoDatabase database) {
         this.posts = database.getCollection("posts", Post.class);
-        this.checks = database.getCollection("checks", PostCheck.class);
+        this.checks = database.getCollection("checks", PostAnnotation.class);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class StandardPostRepository implements PostRepository {
     }
 
     @Override
-    public void createCheck(@NonNull PostCheck check) {
+    public void createAnnotation(@NonNull PostAnnotation check) {
         checks.insertOne(check);
     }
 
@@ -48,18 +48,18 @@ public class StandardPostRepository implements PostRepository {
     }
 
     @Override
-    public List<PostCheck> findChecksById(@NonNull ObjectId id) {
+    public List<PostAnnotation> findAnnotationsById(@NonNull ObjectId id) {
         return checks.find(eq("postId", id)).into(new ArrayList<>());
     }
 
     @Override
-    public boolean upvoteCheck(@NonNull ObjectId id, @NonNull ObjectId userId) {
+    public boolean upvoteAnnotation(@NonNull ObjectId id, @NonNull ObjectId userId) {
         var updates = Updates.combine(Updates.addToSet("upvotes", id), Updates.pull("downvotes", id));
         return checks.updateOne(eq("_id", id), updates).getMatchedCount() > 0;
     }
 
     @Override
-    public boolean downvoteCheck(@NonNull ObjectId id, @NonNull ObjectId userId) {
+    public boolean downvoteAnnotation(@NonNull ObjectId id, @NonNull ObjectId userId) {
         var updates = Updates.combine(Updates.pull("upvotes", id), Updates.addToSet("downvotes", id));
         return checks.updateOne(eq("_id", id), updates).getMatchedCount() > 0;
     }

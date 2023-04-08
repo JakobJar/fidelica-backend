@@ -70,7 +70,7 @@ public class ArticleController {
 
         User user = context.sessionAttribute("user");
         if (!permissionProcessor.hasPermission(user, "article.create"))
-            throw new UnauthorizedResponse("You do not have permission to create fact checks.");
+            throw new UnauthorizedResponse("You do not have permission to create articles.");
 
         // TODO: Check language is valid.
         var article = new StandardArticle(ObjectId.get(), title, shortDescription, rating, content, Locale.forLanguageTag(language));

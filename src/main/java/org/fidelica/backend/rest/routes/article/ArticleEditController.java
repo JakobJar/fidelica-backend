@@ -83,7 +83,7 @@ public class ArticleEditController {
 
         User user = context.sessionAttribute("user");
         if (!permissionProcessor.hasPermission(user, "article.edit"))
-            throw new UnauthorizedResponse("You do not have permission to edit fact checks.");
+            throw new UnauthorizedResponse("You do not have permission to edit articles.");
 
         var article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundResponse("Article not found."));
 

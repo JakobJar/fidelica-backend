@@ -3,7 +3,7 @@ package org.fidelica.backend.post;
 import lombok.Getter;
 
 @Getter
-public enum PostCheckRating {
+public enum PostRating {
 
     TRUE("True"),
     MOSTLY_TRUE("Mostly true"),
@@ -13,7 +13,7 @@ public enum PostCheckRating {
 
     private final String displayName;
 
-    PostCheckRating(String displayName) {
+    PostRating(String displayName) {
         this.displayName = displayName;
     }
 }

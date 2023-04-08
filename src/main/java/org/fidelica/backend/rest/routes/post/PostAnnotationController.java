@@ -8,8 +8,8 @@ import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.post.Post;
-import org.fidelica.backend.post.PostCheckRating;
-import org.fidelica.backend.post.StandardPostCheck;
+import org.fidelica.backend.post.PostRating;
+import org.fidelica.backend.post.StandardPostAnnotation;
 import org.fidelica.backend.post.url.PostURLProvider;
 import org.fidelica.backend.repository.repositories.post.PostRepository;
 import org.fidelica.backend.user.User;
@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PostCheckController {
+public class PostAnnotationController {
 
     private final PostRepository postRepository;
     private final Set<PostURLProvider> postURLProvider;
@@ -28,8 +28,8 @@ public class PostCheckController {
     private final UserPermissionProcessor permissionProcessor;
 
     @Inject
-    public PostCheckController(@NonNull PostRepository postRepository, @NonNull Set<PostURLProvider> postURLProvider,
-                               @NonNull UserPermissionProcessor permissionProcessor) {
+    public PostAnnotationController(@NonNull PostRepository postRepository, @NonNull Set<PostURLProvider> postURLProvider,
+                                    @NonNull UserPermissionProcessor permissionProcessor) {
         this.postRepository = postRepository;
         this.postURLProvider = postURLProvider;
         this.permissionProcessor = permissionProcessor;
@@ -44,9 +44,9 @@ public class PostCheckController {
         }
 
         var post = postRepository.findById(id).orElseThrow(() -> new NotFoundResponse("Post not found."));
-        var checks = postRepository.findChecksById(post.getId());
+        var annotations = postRepository.findAnnotationsById(post.getId());
 
-        context.json(checks);
+        context.json(annotations);
     }
 
     public void getByURL(@NonNull Context context) {
@@ -55,20 +55,20 @@ public class PostCheckController {
         var postProvider = getProvider(url);
 
         var post = postProvider.getPostByURL(url).orElseThrow(() -> new NotFoundResponse("Post not found."));
-        var checks = postRepository.findChecksById(post.getId());
+        var annotations = postRepository.findAnnotationsById(post.getId());
 
-        context.json(checks);
+        context.json(annotations);
     }
 
-    public void reportPost(@NonNull Context context) {
+    public void annotatePost(@NonNull Context context) {
         var url = context.formParam("postURL");
         var rawRating = context.formParam("rating");
         var comment = context.formParam("comment");
         var rawRelatedArticles = context.formParams("relatedArticles");
 
-        PostCheckRating rating;
+        PostRating rating;
         try {
-            rating = PostCheckRating.valueOf(rawRating.toUpperCase(Locale.ROOT));
+            rating = PostRating.valueOf(rawRating.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse("Rating is invalid.");
         }
@@ -79,47 +79,47 @@ public class PostCheckController {
                     .map(ObjectId::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (IllegalArgumentException e) {
-            throw new BadRequestResponse("Contains invalid related fact check id: " + e.getMessage());
+            throw new BadRequestResponse("Contains invalid related annotation id: " + e.getMessage());
         }
 
         User user = context.sessionAttribute("user");
-        if (!permissionProcessor.hasPermission(user, "postCheck.create"))
-            throw new UnauthorizedResponse("You don't have permission to create a check.");
+        if (!permissionProcessor.hasPermission(user, "annotation.create"))
+            throw new UnauthorizedResponse("You don't have permission to create an annotation.");
 
         var postProvider = getProvider(url);
         Post post = postProvider.getPostByURL(url).orElse(null);
         if (post == null)
             post = postProvider.createPost(url);
 
-        var postCheck = new StandardPostCheck(ObjectId.get(), post.getId(), rating, comment, relatedArticles, user.getId());
-        postRepository.createCheck(postCheck);
-        context.json(postCheck);
+        var annotation = new StandardPostAnnotation(ObjectId.get(), post.getId(), rating, comment, relatedArticles, user.getId());
+        postRepository.createAnnotation(annotation);
+        context.json(annotation);
     }
 
-    public void upvoteCheck(@NonNull Context context) {
-        voteCheck(context, true);
+    public void upvoteAnnotation(@NonNull Context context) {
+        voteAnnotation(context, true);
     }
 
-    public void downvoteCheck(@NonNull Context context) {
-        voteCheck(context, false);
+    public void downvoteAnnotation(@NonNull Context context) {
+        voteAnnotation(context, false);
     }
 
-    protected void voteCheck(@NonNull Context context, @NonNull boolean upvote) {
-        ObjectId checkId;
+    protected void voteAnnotation(@NonNull Context context, @NonNull boolean upvote) {
+        ObjectId postId;
         try {
-            checkId = new ObjectId(context.pathParam("checkId"));
+            postId = new ObjectId(context.pathParam("postId"));
         } catch (IllegalArgumentException e) {
-            throw new BadRequestResponse("Invalid check id.");
+            throw new BadRequestResponse("Invalid annotation id.");
         }
 
         User user = context.sessionAttribute("user");
-        if (!permissionProcessor.hasPermission(user, "postCheck.vote"))
+        if (!permissionProcessor.hasPermission(user, "annotation.vote"))
             throw new UnauthorizedResponse("You don't have permission to vote.");
 
-        var success = (upvote) ? postRepository.upvoteCheck(checkId, user.getId())
-                : postRepository.downvoteCheck(checkId, user.getId());
+        var success = (upvote) ? postRepository.upvoteAnnotation(postId, user.getId())
+                : postRepository.downvoteAnnotation(postId, user.getId());
         if (!success)
-            throw new NotFoundResponse("Check not found.");
+            throw new NotFoundResponse("Annotation not found.");
 
         context.result("Success");
     }

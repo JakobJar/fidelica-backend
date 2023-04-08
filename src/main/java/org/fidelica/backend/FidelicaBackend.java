@@ -36,7 +36,7 @@ import org.fidelica.backend.rest.json.ObjectIdAdapter;
 import org.fidelica.backend.rest.routes.article.ArticleController;
 import org.fidelica.backend.rest.routes.article.ArticleEditController;
 import org.fidelica.backend.rest.routes.moderation.ArticleModerationController;
-import org.fidelica.backend.rest.routes.post.PostCheckController;
+import org.fidelica.backend.rest.routes.post.PostAnnotationController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
 import org.fidelica.backend.user.UserModule;
@@ -104,7 +104,7 @@ public class FidelicaBackend extends AbstractModule {
         var articleEditController = injector.getInstance(ArticleEditController.class);
         var articleModerationController = injector.getInstance(ArticleModerationController.class);
 
-        var postController = injector.getInstance(PostCheckController.class);
+        var postController = injector.getInstance(PostAnnotationController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -118,14 +118,14 @@ public class FidelicaBackend extends AbstractModule {
                 get("/{id}", userController::getUserById);
             });
 
-            post("/report", postController::reportPost, AccessRole.AUTHENTICATED);
+            post("/report", postController::annotatePost, AccessRole.AUTHENTICATED);
 
             path("/check", () -> {
                 get("/url/<url>", postController::getByURL);
                 path("/id/{postId}", () -> {
                     get(postController::getById);
-                    post("/upvote", postController::upvoteCheck, AccessRole.AUTHENTICATED);
-                    post("/downvote", postController::downvoteCheck, AccessRole.AUTHENTICATED);
+                    post("/upvote", postController::upvoteAnnotation, AccessRole.AUTHENTICATED);
+                    post("/downvote", postController::downvoteAnnotation, AccessRole.AUTHENTICATED);
                 });
             });
 
