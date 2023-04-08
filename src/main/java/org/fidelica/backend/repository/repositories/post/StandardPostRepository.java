@@ -24,7 +24,7 @@ public class StandardPostRepository implements PostRepository {
     @Inject
     public StandardPostRepository(@NonNull MongoDatabase database) {
         this.posts = database.getCollection("posts", Post.class);
-        this.checks = database.getCollection("checks", PostAnnotation.class);
+        this.checks = database.getCollection("annotations", PostAnnotation.class);
     }
 
     @Override
