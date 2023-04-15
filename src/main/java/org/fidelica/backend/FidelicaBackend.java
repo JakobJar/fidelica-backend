@@ -120,7 +120,7 @@ public class FidelicaBackend extends AbstractModule {
 
             post("/report", postController::annotatePost, AccessRole.AUTHENTICATED);
 
-            path("/check", () -> {
+            path("/annotation", () -> {
                 get("/url/<url>", postController::getByURL);
                 path("/id/{postId}", () -> {
                     get(postController::getById);
@@ -178,7 +178,7 @@ public class FidelicaBackend extends AbstractModule {
         var packages = new String[] { "org.fidelica.backend.user",
                 "org.fidelica.backend.user.login", "org.fidelica.backend.user.group", "org.fidelica.backend.article",
                 "org.fidelica.backend.article.history", "org.fidelica.backend.article.history.difference",
-                "org.fidelica.backend.post", "org.fidelica.backend.post.twitter"};
+                "org.fidelica.backend.post", "org.fidelica.backend.post.platform.twitter"};
 
         var defaultCodec = MongoClientSettings.getDefaultCodecRegistry();
         var pojoCodecProvider = PojoCodecProvider.builder()
