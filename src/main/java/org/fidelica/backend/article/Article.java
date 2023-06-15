@@ -12,8 +12,6 @@ public interface Article extends Identifiable {
 
     String getShortDescription();
 
-    ArticleRating getRating();
-
     String getContent();
 
     Locale getLanguage();

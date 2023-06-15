@@ -11,7 +11,6 @@ import lombok.NonNull;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.fidelica.backend.article.Article;
-import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.ArticleEdit;
 
 import java.util.ArrayList;

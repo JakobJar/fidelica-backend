@@ -7,7 +7,6 @@ import io.javalin.http.NotFoundResponse;
 import io.javalin.http.UnauthorizedResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.ArticleEdit;
 import org.fidelica.backend.article.history.ComputedArticleEdit;
 import org.fidelica.backend.article.history.StandardArticleEdit;
@@ -61,19 +60,11 @@ public class ArticleEditController {
 
         title = title.trim();
         shortDescription = shortDescription.trim();
-        rawRating = rawRating.trim();
         content = content.trim();
         description = description.trim();
 
         if (!textPattern.matcher(title).matches())
             throw new BadRequestResponse("Title contains invalid characters.");
-
-        ArticleRating rating;
-        try {
-            rating = ArticleRating.valueOf(rawRating.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestResponse("Invalid rating.");
-        }
 
         if (!textPattern.matcher(shortDescription).matches())
             throw new BadRequestResponse("Claim contains invalid characters.");
@@ -93,23 +84,19 @@ public class ArticleEditController {
 
         String newTitle = null;
         String newClaim = null;
-        ArticleRating newRating = null;
 
         if (!article.getTitle().equals(title))
             newTitle = title;
-
-        if (!article.getRating().equals(rating))
-            newRating = rating;
 
         if (!article.getShortDescription().equals(shortDescription))
             newClaim = shortDescription;
 
         var contentChanges = textDifferenceProcessor.getDifference(article.getContent(), content);
 
-        if (newTitle == null && newClaim == null && newRating == null && contentChanges.isEmpty())
+        if (newTitle == null && newClaim == null && contentChanges.isEmpty())
             throw new BadRequestResponse("No changes compared to current version.");
 
-        var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, newRating, contentChanges, user.getId());
+        var edit = new StandardArticleEdit(ObjectId.get(), articleId, description, newTitle, newClaim, contentChanges, user.getId());
         editRepository.create(edit);
 
         context.json(edit);

@@ -2,7 +2,6 @@ package org.fidelica.backend.article.history;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.difference.TextDifference;
 import org.fidelica.backend.repository.Identifiable;
 
@@ -17,8 +16,6 @@ public interface ArticleEdit extends Identifiable {
     String getTitle();
 
     String getShortDescription();
-
-    ArticleRating getRating();
 
     List<TextDifference> getDifferences();
 

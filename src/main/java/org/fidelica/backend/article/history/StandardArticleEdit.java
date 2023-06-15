@@ -5,7 +5,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
-import org.fidelica.backend.article.ArticleRating;
 import org.fidelica.backend.article.history.difference.TextDifference;
 
 import java.time.LocalDateTime;
@@ -25,7 +24,6 @@ public class StandardArticleEdit implements ArticleEdit {
 
     private String title;
     private String shortDescription;
-    private ArticleRating rating;
     private final List<TextDifference> differences;
     private final ObjectId editorId;
 
@@ -34,21 +32,19 @@ public class StandardArticleEdit implements ArticleEdit {
     private String comment;
 
     public StandardArticleEdit(ObjectId id, ObjectId articleId, String description,
-                               String title, String shortDescription, ArticleRating rating,
+                               String title, String shortDescription,
                                List<TextDifference> differences, ObjectId editorId) {
-        this(id, articleId, description, title, shortDescription, rating, differences, editorId, false, null, null);
+        this(id, articleId, description, title, shortDescription, differences, editorId, false, null, null);
     }
 
     public StandardArticleEdit(@NonNull ObjectId id, @NonNull ObjectId articleId, @NonNull String description,
-                               String title, String shortDescription, ArticleRating rating,
-                               @NonNull List<TextDifference> differences, @NonNull ObjectId editorId,
-                               boolean approved, ObjectId checkerId, String comment) {
+                               String title, String shortDescription, @NonNull List<TextDifference> differences,
+                               @NonNull ObjectId editorId, boolean approved, ObjectId checkerId, String comment) {
         this.id = id;
         this.articleId = articleId;
         this.description = description;
         this.title = title;
         this.shortDescription = shortDescription;
-        this.rating = rating;
         this.differences = differences;
         this.editorId = editorId;
         this.approved = approved;
