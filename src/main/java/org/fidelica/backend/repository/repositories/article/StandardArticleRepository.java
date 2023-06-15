@@ -72,7 +72,7 @@ public class StandardArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public boolean update(@NonNull ObjectId id, String title, String shortDescription, String content, ArticleRating rating) {
+    public boolean update(@NonNull ObjectId id, String title, String shortDescription, String content) {
         List<Bson> changes = new ArrayList<>();
         if (title != null)
             changes.add(Updates.set("title", title));
@@ -80,8 +80,6 @@ public class StandardArticleRepository implements ArticleRepository {
             changes.add(Updates.set("shortDescription", shortDescription));
         if (content != null)
             changes.add(Updates.set("content", content));
-        if (rating != null)
-            changes.add(Updates.set("rating", rating));
 
         return articles.updateOne(eq("_id", id), Updates.combine(changes)).wasAcknowledged();
     }

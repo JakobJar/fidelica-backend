@@ -85,7 +85,7 @@ public class ArticleModerationController {
                     var newContent = differenceProcessor.applyDifferences(article.getContent(), edit.getDifferences());
                     var newDifferences = differenceProcessor.getDifference(newContent, article.getContent());
 
-                    articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent, edit.getRating());
+                    articleRepository.update(article.getId(), edit.getTitle(), edit.getShortDescription(), newContent);
                     editRepository.updateDifferences(editId, newDifferences);
                 }
 

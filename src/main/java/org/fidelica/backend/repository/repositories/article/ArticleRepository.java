@@ -20,5 +20,5 @@ public interface ArticleRepository {
 
     void updateVisibility(ObjectId id, boolean visible);
 
-    boolean update(ObjectId id, String title, String shortDescription, String content, ArticleRating rating);
+    boolean update(ObjectId id, String title, String shortDescription, String content);
 }
