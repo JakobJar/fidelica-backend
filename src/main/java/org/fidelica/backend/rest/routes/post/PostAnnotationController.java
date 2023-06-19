@@ -66,10 +66,13 @@ public class PostAnnotationController {
         var comment = context.formParam("comment");
         var rawRelatedArticles = context.formParams("relatedArticles");
 
+        if (url == null || rawRating == null || comment == null)
+            throw new BadRequestResponse("Missing required parameters.");
+
         PostRating rating;
         try {
             rating = PostRating.valueOf(rawRating.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new BadRequestResponse("Rating is invalid.");
         }
 
