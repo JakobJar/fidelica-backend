@@ -33,9 +33,7 @@ import org.fidelica.backend.rest.access.RestAccessManager;
 import org.fidelica.backend.rest.json.AnnotationExcludeStrategy;
 import org.fidelica.backend.rest.json.GsonMapper;
 import org.fidelica.backend.rest.json.ObjectIdAdapter;
-import org.fidelica.backend.rest.routes.article.ArticleController;
-import org.fidelica.backend.rest.routes.article.ArticleEditController;
-import org.fidelica.backend.rest.routes.moderation.ArticleModerationController;
+import org.fidelica.backend.rest.routes.cors.CorsProxyController;
 import org.fidelica.backend.rest.routes.post.PostAnnotationController;
 import org.fidelica.backend.rest.routes.user.UserAuthenticationController;
 import org.fidelica.backend.rest.routes.user.UserController;
@@ -100,11 +98,13 @@ public class FidelicaBackend extends AbstractModule {
         var userAuthenticationController = injector.getInstance(UserAuthenticationController.class);
         var userController = injector.getInstance(UserController.class);
 
-        var articleController = injector.getInstance(ArticleController.class);
+        /*var articleController = injector.getInstance(ArticleController.class);
         var articleEditController = injector.getInstance(ArticleEditController.class);
-        var articleModerationController = injector.getInstance(ArticleModerationController.class);
+        var articleModerationController = injector.getInstance(ArticleModerationController.class);*/
 
         var postController = injector.getInstance(PostAnnotationController.class);
+
+        var corsController = injector.getInstance(CorsProxyController.class);
 
         app.routes(() -> {
             path("/auth", () -> {
@@ -129,7 +129,9 @@ public class FidelicaBackend extends AbstractModule {
                 });
             });
 
-            path("/article", () -> {
+            get("/cors/", corsController::removeCorsHeaders);
+
+            /*path("/article", () -> {
                 post("/", articleController::createArticle, AccessRole.AUTHENTICATED);
                 get("/search", articleController::searchArticles);
                 path("/{articleId}", () -> {
@@ -147,7 +149,7 @@ public class FidelicaBackend extends AbstractModule {
 
             path("/moderation", () -> {
                 get("/edits", articleModerationController::getPendingEdits, AccessRole.AUTHENTICATED);
-            });
+            });*/
         });
     }
 
