@@ -18,7 +18,7 @@ public interface PostRepository {
 
     Optional<Tweet> findTweetById(long id);
 
-    List<PostAnnotation> findAnnotationsById(ObjectId id);
+    List<PostAnnotation> findAnnotationsByPostId(ObjectId postId);
 
     boolean upvoteAnnotation(ObjectId id, ObjectId userId);
 

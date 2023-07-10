@@ -1,10 +1,10 @@
 package org.fidelica.backend.rest.routes.cors;
 
+import com.google.inject.Inject;
 import io.javalin.http.Context;
 import io.javalin.http.InternalServerErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

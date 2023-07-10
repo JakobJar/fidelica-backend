@@ -44,7 +44,7 @@ public class PostAnnotationController {
         }
 
         var post = postRepository.findById(id).orElseThrow(() -> new NotFoundResponse("Post not found."));
-        var annotations = postRepository.findAnnotationsById(post.getId());
+        var annotations = postRepository.findAnnotationsByPostId(post.getId());
 
         context.json(annotations);
     }
@@ -55,7 +55,7 @@ public class PostAnnotationController {
         var postProvider = getProvider(url);
 
         var post = postProvider.getPostByURL(url).orElseThrow(() -> new NotFoundResponse("Post not found."));
-        var annotations = postRepository.findAnnotationsById(post.getId());
+        var annotations = postRepository.findAnnotationsByPostId(post.getId());
 
         context.json(annotations);
     }
@@ -107,7 +107,7 @@ public class PostAnnotationController {
         voteAnnotation(context, false);
     }
 
-    protected void voteAnnotation(@NonNull Context context, @NonNull boolean upvote) {
+    protected void voteAnnotation(@NonNull Context context, boolean upvote) {
         ObjectId postId;
         try {
             postId = new ObjectId(context.pathParam("postId"));

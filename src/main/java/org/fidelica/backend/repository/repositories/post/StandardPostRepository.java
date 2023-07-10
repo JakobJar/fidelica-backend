@@ -3,6 +3,7 @@ package org.fidelica.backend.repository.repositories.post;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -48,8 +49,9 @@ public class StandardPostRepository implements PostRepository {
     }
 
     @Override
-    public List<PostAnnotation> findAnnotationsById(@NonNull ObjectId id) {
-        return checks.find(eq("postId", id)).into(new ArrayList<>());
+    public List<PostAnnotation> findAnnotationsByPostId(@NonNull ObjectId postId) {
+        return checks.find(eq("postId", postId))
+                .into(new ArrayList<>());
     }
 
     @Override
