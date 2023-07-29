@@ -122,14 +122,14 @@ public class FidelicaBackend extends AbstractModule {
                 post(postController::annotatePost, AccessRole.AUTHENTICATED);
                 get("/url/<url>", postController::getByURL);
 
-                path("/id/{postId}", () -> {
-                    get(postController::getById);
+                path("/id/{id}", () -> {
+                    get(postController::getAnnotationById);
                     post("/upvote", postController::upvoteAnnotation, AccessRole.AUTHENTICATED);
                     post("/downvote", postController::downvoteAnnotation, AccessRole.AUTHENTICATED);
                 });
             });
 
-            get("/cors/", corsController::removeCorsHeaders);
+            //get("/cors/", corsController::removeCorsHeaders);
 
             /*path("/article", () -> {
                 post("/", articleController::createArticle, AccessRole.AUTHENTICATED);

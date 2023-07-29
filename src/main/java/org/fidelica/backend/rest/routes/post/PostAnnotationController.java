@@ -35,20 +35,6 @@ public class PostAnnotationController {
         this.permissionProcessor = permissionProcessor;
     }
 
-    public void getById(@NonNull Context context) {
-        ObjectId id;
-        try {
-            id = new ObjectId(context.pathParam("postId"));
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestResponse("Invalid post id.");
-        }
-
-        var post = postRepository.findById(id).orElseThrow(() -> new NotFoundResponse("Post not found."));
-        var annotations = postRepository.findAnnotationsByPostId(post.getId());
-
-        context.json(annotations);
-    }
-
     public void getByURL(@NonNull Context context) {
         var url = context.pathParam("url");
 
@@ -99,6 +85,19 @@ public class PostAnnotationController {
         context.json(annotation);
     }
 
+    public void getAnnotationById(@NonNull Context context) {
+        ObjectId id;
+        try {
+            id = new ObjectId(context.pathParam("id"));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse("Invalid annotation id.");
+        }
+
+        var annotation = postRepository.findAnnotationById(id).orElseThrow(() -> new NotFoundResponse("Annotation not found."));
+
+        context.json(annotation);
+    }
+
     public void upvoteAnnotation(@NonNull Context context) {
         voteAnnotation(context, true);
     }
@@ -108,9 +107,9 @@ public class PostAnnotationController {
     }
 
     protected void voteAnnotation(@NonNull Context context, boolean upvote) {
-        ObjectId postId;
+        ObjectId annotationId;
         try {
-            postId = new ObjectId(context.pathParam("postId"));
+            annotationId = new ObjectId(context.pathParam("id"));
         } catch (IllegalArgumentException e) {
             throw new BadRequestResponse("Invalid annotation id.");
         }
@@ -119,8 +118,8 @@ public class PostAnnotationController {
         if (!permissionProcessor.hasPermission(user, "annotation.vote"))
             throw new UnauthorizedResponse("You don't have permission to vote.");
 
-        var success = (upvote) ? postRepository.upvoteAnnotation(postId, user.getId())
-                : postRepository.downvoteAnnotation(postId, user.getId());
+        var success = (upvote) ? postRepository.upvoteAnnotation(annotationId, user.getId())
+                : postRepository.downvoteAnnotation(annotationId, user.getId());
         if (!success)
             throw new NotFoundResponse("Annotation not found.");
 

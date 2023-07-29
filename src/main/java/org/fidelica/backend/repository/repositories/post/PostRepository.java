@@ -16,6 +16,8 @@ public interface PostRepository {
 
     Optional<Post> findById(ObjectId id);
 
+    Optional<PostAnnotation> findAnnotationById(ObjectId id);
+
     Optional<Tweet> findTweetById(long id);
 
     List<PostAnnotation> findAnnotationsByPostId(ObjectId postId);

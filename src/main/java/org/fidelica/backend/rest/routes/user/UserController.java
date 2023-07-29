@@ -3,6 +3,7 @@ package org.fidelica.backend.rest.routes.user;
 import com.google.inject.Inject;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.Header;
 import io.javalin.http.NotFoundResponse;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -33,6 +34,7 @@ public class UserController {
         boolean preview = context.queryParamAsClass("preview", Boolean.class).getOrDefault(false);
 
         if (preview) {
+            context.header(Header.CACHE_CONTROL, "max-age=300");
             repository.findPreviewById(id).ifPresentOrElse(context::json, () -> {
                 throw new NotFoundResponse("User not found.");
             });
