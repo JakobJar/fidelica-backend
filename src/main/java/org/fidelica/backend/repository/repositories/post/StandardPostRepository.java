@@ -60,13 +60,13 @@ public class StandardPostRepository implements PostRepository {
 
     @Override
     public boolean upvoteAnnotation(@NonNull ObjectId id, @NonNull ObjectId userId) {
-        var updates = Updates.combine(Updates.addToSet("upvotes", id), Updates.pull("downvotes", id));
+        var updates = Updates.combine(Updates.addToSet("upvoters", id), Updates.pull("downvoters", id));
         return annotations.updateOne(eq("_id", id), updates).getMatchedCount() > 0;
     }
 
     @Override
     public boolean downvoteAnnotation(@NonNull ObjectId id, @NonNull ObjectId userId) {
-        var updates = Updates.combine(Updates.pull("upvotes", id), Updates.addToSet("downvotes", id));
+        var updates = Updates.combine(Updates.pull("upvoters", id), Updates.addToSet("downvoters", id));
         return annotations.updateOne(eq("_id", id), updates).getMatchedCount() > 0;
     }
 }
