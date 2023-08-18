@@ -25,4 +25,6 @@ public interface PostRepository {
     boolean upvoteAnnotation(ObjectId id, ObjectId userId);
 
     boolean downvoteAnnotation(ObjectId id, ObjectId userId);
+
+    boolean removeAnnotationVote(ObjectId id, ObjectId userId);
 }

@@ -99,14 +99,18 @@ public class PostAnnotationController {
     }
 
     public void upvoteAnnotation(@NonNull Context context) {
-        voteAnnotation(context, true);
+        voteAnnotation(context, VoteType.UPVOTE);
     }
 
     public void downvoteAnnotation(@NonNull Context context) {
-        voteAnnotation(context, false);
+        voteAnnotation(context, VoteType.DOWNVOTE);
     }
 
-    protected void voteAnnotation(@NonNull Context context, boolean upvote) {
+    public void removeAnnotationVote(@NonNull Context context) {
+        voteAnnotation(context, VoteType.REMOVE);
+    }
+
+    protected void voteAnnotation(@NonNull Context context, VoteType type) {
         ObjectId annotationId;
         try {
             annotationId = new ObjectId(context.pathParam("id"));
@@ -118,8 +122,11 @@ public class PostAnnotationController {
         if (!permissionProcessor.hasPermission(user, "annotation.vote"))
             throw new UnauthorizedResponse("You don't have permission to vote.");
 
-        var success = (upvote) ? postRepository.upvoteAnnotation(annotationId, user.getId())
-                : postRepository.downvoteAnnotation(annotationId, user.getId());
+        var success = switch (type) {
+            case UPVOTE -> postRepository.upvoteAnnotation(annotationId, user.getId());
+            case DOWNVOTE -> postRepository.downvoteAnnotation(annotationId, user.getId());
+            case REMOVE -> postRepository.removeAnnotationVote(annotationId, user.getId());
+        };
         if (!success)
             throw new NotFoundResponse("Annotation not found.");
 
@@ -131,5 +138,12 @@ public class PostAnnotationController {
                 .filter(provider -> provider.matches(url))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestResponse("Post url is not supported or invalid."));
+    }
+
+    private enum VoteType {
+
+        UPVOTE,
+        DOWNVOTE,
+        REMOVE;
     }
 }

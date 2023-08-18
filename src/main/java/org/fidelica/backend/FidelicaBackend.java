@@ -126,6 +126,7 @@ public class FidelicaBackend extends AbstractModule {
                     get(postController::getAnnotationById);
                     post("/upvote", postController::upvoteAnnotation, AccessRole.AUTHENTICATED);
                     post("/downvote", postController::downvoteAnnotation, AccessRole.AUTHENTICATED);
+                    post("/remove-vote", postController::removeAnnotationVote, AccessRole.AUTHENTICATED);
                 });
             });
 
